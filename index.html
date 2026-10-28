@@ -7,196 +7,135 @@
 <meta name="theme-color" content="#0b1020">
 <title>Cipher Chat</title>
 <style>
-:root{color-scheme:dark;--bg:#080b14;--panel:#111827;--panel2:#0d1422;--line:#263348;--text:#edf3ff;--muted:#91a0b8;--accent:#8b9cff;--accent2:#6477f5;--good:#79e2b2;--bad:#ff8b9c}
+:root{color-scheme:dark;--bg:#080b14;--panel:#111827;--line:#263348;--text:#edf3ff;--muted:#91a0b8;--good:#79e2b2;--bad:#ff8b9c}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#1b2850 0,transparent 52%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#1b2850 0,transparent 52%),var(--bg);color:var(--text);font:16px/1.5 system-ui,sans-serif;display:flex;flex-direction:column}
 button,input,textarea{font:inherit}
-button{cursor:pointer;border:1px solid var(--line);border-radius:13px;padding:12px 16px;color:var(--text);background:#182236;transition:transform .15s,border-color .15s,background .15s}
+button{cursor:pointer;border:1px solid var(--line);border-radius:13px;padding:11px 15px;color:var(--text);background:#182236}
 button:hover{border-color:#7486ff;background:#202d49}
-button:active{transform:scale(.985)}
 button:disabled{opacity:.45;cursor:not-allowed}
-.wrap{width:min(100% - 32px,900px);margin:auto;padding:32px 0 24px;flex:1;display:flex;flex-direction:column}
-header{display:flex;align-items:center;gap:12px;margin-bottom:42px}
-.logo{width:44px;height:44px;border:1px solid #485b96;background:linear-gradient(145deg,#25386b,#111a31);border-radius:14px;display:grid;place-items:center;font-size:22px;color:#c7d1ff;box-shadow:0 8px 30px #0004}
-h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.4px}
-header p{margin:4px 0 0;color:var(--muted);font-size:13px}
-main{width:100%;max-width:720px;margin:0 auto;flex:1}
-.eyebrow{text-transform:uppercase;letter-spacing:2.5px;font-size:11px;color:#aab6ff;font-weight:700;text-align:center;margin:0 0 12px}
-.hero{text-align:center;margin:0 auto 28px}
-.hero h2{font-size:clamp(30px,6vw,48px);line-height:1.08;letter-spacing:-1.8px;margin:0 0 14px}
-.hero h2 span{color:#9eacff}
-.hero p{color:var(--muted);max-width:500px;margin:0 auto}
-.home-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0}
-.action{min-height:150px;text-align:left;padding:22px;display:flex;flex-direction:column;align-items:flex-start;gap:9px;background:linear-gradient(145deg,#151f34,#0e1524)}
-.action .symbol{font-size:25px;color:#b8c3ff}
-.action strong{font-size:18px}
-.action small{color:var(--muted);font-size:13px;font-weight:400}
-.action.primary{border-color:#4f61c2;background:linear-gradient(145deg,#202c55,#141c34)}
-.note{display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border:1px solid #23354a;background:#0c1421;border-radius:14px;color:var(--muted);font-size:13px}
-.note b{color:#dfe6ff}
-.panel{background:linear-gradient(150deg,#131c2d,#0d1320);border:1px solid var(--line);border-radius:20px;padding:clamp(18px,4vw,28px);box-shadow:0 20px 70px #0003}
-.hidden{display:none!important}
-.panel h2{font-size:24px;margin:0 0 5px;letter-spacing:-.5px}
-.sub{margin:0 0 22px;color:var(--muted);font-size:14px}
-label{display:block;font-size:13px;color:#cbd5e8;margin:14px 0 7px}
-input,textarea{width:100%;background:#080e19;color:var(--text);border:1px solid #2b3a52;border-radius:11px;padding:12px 13px;outline:none}
-input:focus,textarea:focus{border-color:#8291ff;box-shadow:0 0 0 3px #8291ff20}
+input,textarea{width:100%;background:#080e19;color:var(--text);border:1px solid #2b3a52;border-radius:11px;padding:12px;outline:none}
+input:focus,textarea:focus{border-color:#8291ff}
 input::placeholder,textarea::placeholder{color:#65748c}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.row>*{flex:1}
+.wrap{width:min(100% - 30px,900px);margin:auto;padding:28px 0 24px;flex:1;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;margin-bottom:35px}
+.logo{width:44px;height:44px;border:1px solid #485b96;background:linear-gradient(145deg,#25386b,#111a31);border-radius:14px;display:grid;place-items:center;font-size:22px;color:#c7d1ff}
+h1{font-size:20px;margin:0}header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+main{width:100%;max-width:720px;margin:auto;flex:1}
+.hidden{display:none!important}
+.hero{text-align:center;margin:0 auto 28px}
+.eyebrow{text-transform:uppercase;letter-spacing:2.5px;font-size:11px;color:#aab6ff;font-weight:700}
+.hero h2{font-size:clamp(30px,6vw,48px);line-height:1.1;letter-spacing:-1.5px;margin:12px 0}
+.hero h2 span{color:#9eacff}.hero p{color:var(--muted);max-width:520px;margin:0 auto}
+.home-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:28px 0}
+.action{min-height:140px;text-align:left;padding:22px;display:flex;flex-direction:column;align-items:flex-start;gap:9px;background:linear-gradient(145deg,#151f34,#0e1524)}
+.action .symbol{font-size:25px;color:#b8c3ff}.action strong{font-size:18px}
+.action small{color:var(--muted);font-size:13px}.action.primary{border-color:#4f61c2;background:linear-gradient(145deg,#202c55,#141c34)}
+.note{padding:14px 16px;border:1px solid #23354a;background:#0c1421;border-radius:14px;color:var(--muted);font-size:13px}
+.note b{color:#dfe6ff}
+.panel{background:linear-gradient(150deg,#131c2d,#0d1320);border:1px solid var(--line);border-radius:20px;padding:clamp(17px,4vw,27px);box-shadow:0 20px 70px #0003}
+.panel h2{font-size:24px;margin:0 0 5px}.sub{margin:0 0 20px;color:var(--muted);font-size:14px}
+label{display:block;font-size:13px;color:#cbd5e8;margin:13px 0 7px}
+.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1}
 .btn-primary{background:linear-gradient(135deg,#7889ff,#596be6);border-color:#8795ff;color:white;font-weight:700}
-.btn-quiet{background:transparent}
-.back{padding:7px 10px;margin-bottom:16px;font-size:13px;color:var(--muted)}
-.status{margin-top:13px;font-size:13px;color:var(--muted);min-height:20px}
-.status.error{color:var(--bad)}
-.status.good{color:var(--good)}
-.keybox{background:#090f1b;border:1px solid #354565;border-radius:13px;padding:15px;margin:15px 0}
-.keybox .caption{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.3px}
-.keytext{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-all;font-size:13px;color:#dce2ff;margin:8px 0}
-.check{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;margin:12px 0}
-.check input{width:16px;height:16px;accent-color:#7d8cff}
+.btn-quiet{background:transparent}.back{padding:7px 10px;margin-bottom:16px;font-size:13px;color:var(--muted)}
+.status{margin-top:12px;font-size:13px;color:var(--muted);min-height:18px}
+.status.error{color:var(--bad)}.status.good{color:var(--good)}
+.keybox{background:#090f1b;border:1px solid #354565;border-radius:13px;padding:14px;margin:12px 0}
+.keytext{font:13px ui-monospace,monospace;overflow-wrap:anywhere;color:#dce2ff;margin:8px 0}
+.check{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px}
+.check input{width:16px;height:16px}
 .room-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:15px;margin-bottom:16px}
 .room-id{font:700 20px ui-monospace,monospace;letter-spacing:3px}
-.room-tools{display:flex;gap:8px;flex-wrap:wrap}
-.room-tools button{padding:8px 10px;font-size:12px}
+.room-tools{display:flex;gap:8px;flex-wrap:wrap}.room-tools button{padding:8px 10px;font-size:12px}
 .chatbox{height:min(48vh,440px);min-height:260px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:6px 2px 14px}
 .empty{margin:auto;text-align:center;color:var(--muted);font-size:14px;padding:28px 10px}
 .message{max-width:88%;padding:10px 13px;border-radius:14px;background:#182338;border:1px solid #263750;align-self:flex-start;white-space:pre-wrap;overflow-wrap:anywhere}
-.message .meta{font-size:10px;color:#aab7d1;margin-bottom:5px}
-.message .body{font-size:14px}
-.message .cipher{font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;color:#b8c7e6;overflow-wrap:anywhere;word-break:break-all}
-.message .cipher-label{font-size:10px;color:#91a0b8;margin-top:8px}
 .message.mine{align-self:flex-end;background:#293765;border-color:#4659a0}
-.message.mine .cipher{color:#d4dcff}
-.key-access{border:1px solid #30415e;background:#0b1220;border-radius:14px;padding:14px;margin:0 0 14px}
-.key-access p{margin:0 0 8px;font-size:13px;color:var(--muted)}
-.key-access .key-row{display:flex;gap:8px;align-items:stretch}
-.key-access input{min-width:0;flex:1}
-.key-access button{flex-shrink:0}
-.key-access .key-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
-.key-access .key-actions button{font-size:12px;padding:8px 10px}
+.meta{font-size:11px;color:#aab7d1;margin-bottom:5px}
+.body{font-size:14px}.cipher{font:11px/1.5 ui-monospace,monospace;color:#b8c7e6;overflow-wrap:anywhere;word-break:break-all}
+.cipher-label{font-size:10px;color:#91a0b8;margin-top:8px}
+.settings-toggle{width:100%;text-align:left;margin-bottom:12px}
+.settings-panel{border:1px solid #30415e;background:#0b1220;border-radius:14px;padding:15px;margin-bottom:15px}
+.settings-panel p{margin:0 0 8px;font-size:13px;color:var(--muted)}
 .compose{display:flex;gap:9px;align-items:flex-end;border-top:1px solid var(--line);padding-top:14px}
-.compose textarea{resize:vertical;min-height:46px;max-height:130px}
-.compose button{min-height:46px}
-.security{font-size:12px;color:var(--muted);margin-top:12px;display:flex;gap:8px}
-.security span{color:var(--good)}
+.compose textarea{resize:vertical;min-height:46px;max-height:130px}.compose button{min-height:46px}
+.security{font-size:12px;color:var(--muted);margin-top:12px}
 footer{text-align:center;color:#64718a;font-size:11px;padding:24px 0 0}
-@media(max-width:520px){
-.wrap{width:min(100% - 22px,900px);padding-top:20px}
-header{margin-bottom:32px}
-.home-actions{grid-template-columns:1fr}
-.action{min-height:118px}
-.hero h2{letter-spacing:-1px}
-.panel{border-radius:16px}
-.message{max-width:94%}
-.compose{align-items:stretch}
-.compose button{padding:10px}
-.key-access .key-row{flex-direction:column}
-}
+@media(max-width:520px){.home-actions{grid-template-columns:1fr}.action{min-height:110px}.panel{border-radius:16px}.message{max-width:95%}.compose button{padding:10px}.wrap{padding-top:20px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header>
-  <div class="logo" aria-hidden="true">⌁</div>
-  <div><h1>Cipher Chat</h1><p>Private messages. Your key, your conversation.</p></div>
-</header>
-
+<header><div class="logo" aria-hidden="true">⌁</div><div><h1>Cipher Chat</h1><p>Public rooms. Encrypted messages.</p></div></header>
 <main>
 <section id="home">
-  <div class="hero">
-    <p class="eyebrow">End-to-end encrypted</p>
-    <h2>Your words.<br><span>Only for the right eyes.</span></h2>
-    <p>Open any existing room to view its encrypted messages. A secret key is only needed to read messages and send new ones.</p>
-  </div>
-  <div class="home-actions">
-    <button class="action primary" id="showCreate">
-      <span class="symbol">＋</span><strong>Add Room</strong>
-      <small>Create a room with a random ID and a strong secret key.</small>
-    </button>
-    <button class="action" id="showJoin">
-      <span class="symbol">↗</span><strong>Join Room</strong>
-      <small>Enter any existing room number. A key is optional.</small>
-    </button>
-  </div>
-  <div class="note">
-    <span>◈</span>
-    <div><b>Public room access, encrypted messages.</b> Anyone can open a room and view its ciphertext. Only someone with the correct key can decrypt the messages. Keep your key private; it cannot be recovered if lost.</div>
-  </div>
+<div class="hero">
+<p class="eyebrow">End-to-end encrypted</p>
+<h2>Your words.<br><span>Only for the right eyes.</span></h2>
+<p>Anyone can open a room and view encrypted messages. A key is only needed to read messages and send new ones.</p>
+</div>
+<div class="home-actions">
+<button class="action primary" id="showCreate"><span class="symbol">＋</span><strong>Create Room</strong><small>Generate a room number and secret key.</small></button>
+<button class="action" id="showJoin"><span class="symbol">↗</span><strong>Join Room</strong><small>Enter a room number. The key is optional.</small></button>
+</div>
+<div class="note"><b>Public room access.</b> Anyone can view the encrypted ciphertext. Only the correct key can decrypt messages. Keep your key private.</div>
 </section>
 
 <section id="createPanel" class="panel hidden">
-  <button class="back" data-back>← Back</button>
-  <h2>Create a room</h2>
-  <p class="sub">Your room number and key will stay the same. Share the key privately if you want someone to read and send messages.</p>
-  <div id="createdDetails" class="hidden">
-    <label>Room number</label>
-    <div class="keybox"><div id="newRoomId" class="room-id"></div></div>
-    <label>Key code — save this somewhere safe</label>
-    <div class="keybox">
-      <div class="caption">Secret key code</div>
-      <div id="newKey" class="keytext"></div>
-      <div class="row">
-        <button id="copyKey" type="button">Copy key</button>
-        <button id="copyDetails" type="button">Copy room + key</button>
-      </div>
-    </div>
-    <label class="check"><input type="checkbox" id="saveNewKey" checked> Save key on this device</label>
-    <button id="openCreatedRoom" class="btn-primary" style="width:100%">Open room</button>
-  </div>
-  <button id="createRoomBtn" class="btn-primary" style="width:100%">Generate secure room</button>
-  <div id="createStatus" class="status" role="status"></div>
+<button class="back" data-back>← Back</button>
+<h2>Create a room</h2><p class="sub">Share the room number to let people view ciphertext. Share the key privately so they can read and send messages.</p>
+<div id="createdDetails" class="hidden">
+<label>Room number</label><div class="keybox"><div id="newRoomId" class="room-id"></div></div>
+<label>Secret key</label><div class="keybox"><div id="newKey" class="keytext"></div><div class="row"><button id="copyKey" type="button">Copy key</button><button id="copyDetails" type="button">Copy room + key</button></div></div>
+<label class="check"><input type="checkbox" id="saveNewKey" checked> Save key on this device</label>
+<button id="openCreatedRoom" class="btn-primary" style="width:100%;margin-top:12px">Open room</button>
+</div>
+<button id="createRoomBtn" class="btn-primary" style="width:100%">Generate secure room</button>
+<div id="createStatus" class="status"></div>
 </section>
 
 <section id="joinPanel" class="panel hidden">
-  <button class="back" data-back>← Back</button>
-  <h2>Join a room</h2>
-  <p class="sub">The room number is enough to view encrypted messages. Add a key if you want to read them.</p>
-  <form id="joinForm">
-    <label for="joinRoomId">4-digit room number</label>
-    <input id="joinRoomId" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="e.g. 4821" required>
-    <label for="joinKey">Secret key (optional)</label>
-    <input id="joinKey" autocomplete="off" placeholder="Leave blank to view ciphertext">
-    <label class="check"><input type="checkbox" id="saveJoinKey"> Save key on this device</label>
-    <button class="btn-primary" type="submit" style="width:100%">Join room</button>
-    <div id="joinStatus" class="status" role="status"></div>
-  </form>
+<button class="back" data-back>← Back</button>
+<h2>Join a room</h2><p class="sub">Enter a room number to see messages. You can enter a key now or later in Room settings.</p>
+<form id="joinForm">
+<label for="joinRoomId">4-digit room number</label><input id="joinRoomId" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="e.g. 4821" required>
+<label for="joinKey">Secret key (optional)</label><input id="joinKey" autocomplete="off" placeholder="Leave blank to view ciphertext">
+<label class="check"><input type="checkbox" id="saveJoinKey"> Save key on this device</label>
+<button class="btn-primary" type="submit" style="width:100%;margin-top:12px">Join room</button>
+<div id="joinStatus" class="status"></div>
+</form>
 </section>
 
 <section id="chatPanel" class="panel hidden">
-  <button class="back" id="leaveRoom">← Rooms</button>
-  <div class="room-head">
-    <div><div class="sub" style="margin:0 0 4px">ROOM NUMBER</div><div id="chatRoomId" class="room-id"></div></div>
-    <div class="room-tools">
-      <button id="copyRoom">Copy room ID</button>
-      <button id="forgetKey" class="btn-quiet">Forget saved key</button>
-    </div>
-  </div>
+<button class="back" id="leaveRoom">← Rooms</button>
+<div class="room-head">
+<div><div class="sub" style="margin:0 0 4px">ROOM NUMBER</div><div id="chatRoomId" class="room-id"></div></div>
+<div class="room-tools"><button id="copyRoom">Copy room ID</button></div>
+</div>
 
-  <div class="key-access">
-    <p id="keyState">Viewing encrypted messages. Enter the secret key to decrypt messages and send messages.</p>
-    <form id="unlockForm">
-      <label for="unlockKey">Room secret key</label>
-      <div class="key-row">
-        <input id="unlockKey" autocomplete="off" placeholder="Paste the key code here">
-        <button class="btn-primary" type="submit" id="unlockButton">Unlock</button>
-      </div>
-      <div class="key-actions">
-        <button type="button" id="lockMessages" class="btn-quiet">View ciphertext instead</button>
-      </div>
-    </form>
-  </div>
+<button class="settings-toggle" id="toggleSettings" aria-expanded="false">⚙ Room settings and encryption ▾</button>
+<div id="settingsPanel" class="settings-panel hidden">
+<p>These settings are separate from the message list.</p>
+<label for="deviceName">Your device display name</label>
+<input id="deviceName" maxlength="40" placeholder="anonymous" autocomplete="nickname">
+<p>Your name is saved automatically on this device. It defaults to anonymous and is attached to new messages.</p>
+<label for="unlockKey">Room secret key</label>
+<input id="unlockKey" autocomplete="off" placeholder="Enter the key to decrypt messages">
+<div class="row" style="margin-top:10px">
+<button class="btn-primary" id="unlockButton" type="button">Unlock</button>
+<button id="lockMessages" type="button">View ciphertext instead</button>
+</div>
+<div id="keyState" class="status">Viewing encrypted messages. Enter a key to decrypt.</div>
+</div>
 
-  <div id="chatMessages" class="chatbox" aria-live="polite">
-    <div class="empty">Loading messages…</div>
-  </div>
-
-  <form id="sendForm" class="compose">
-    <textarea id="messageInput" maxlength="4000" rows="1" placeholder="Unlock the room to send messages…" required disabled></textarea>
-    <button class="btn-primary" id="sendButton" type="submit" disabled>Send</button>
-  </form>
-  <div class="security"><span>●</span><div>Messages are encrypted in your browser using AES-256-GCM. Your secret key is never uploaded to Supabase.</div></div>
-  <div id="chatStatus" class="status" role="status"></div>
+<div id="chatMessages" class="chatbox" aria-live="polite"><div class="empty">Loading messages…</div></div>
+<form id="sendForm" class="compose">
+<textarea id="messageInput" maxlength="4000" rows="1" placeholder="Unlock the room to send messages…" required disabled></textarea>
+<button class="btn-primary" id="sendButton" type="submit" disabled>Send</button>
+</form>
+<div class="security">● Messages are encrypted in your browser using AES-256-GCM. Your room key is never sent to Supabase.</div>
+<div id="chatStatus" class="status"></div>
 </section>
 </main>
 <footer>Cipher Chat · Built for private conversations</footer>
@@ -206,13 +145,14 @@ header{margin-bottom:32px}
 <script>
 "use strict";
 
-/* Supabase stores ciphertext; Web Crypto encrypts and decrypts in the browser. */
 const SUPABASE_URL = "https://vwriqbeupkkmsilinalz.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_aVu3Q53R8H4XlJ2NdHCNEQ_n9uFclNH";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 const $ = id => document.getElementById(id);
-const panels = ["home", "createPanel", "joinPanel", "chatPanel"];
+const panels = ["home","createPanel","joinPanel","chatPanel"];
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 
 let activeRoom = null;
 let activeKey = null;
@@ -221,16 +161,30 @@ let messageChannel = null;
 let currentMessages = {};
 let renderToken = 0;
 
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
+const NAME_STORAGE_KEY = "cipherchat:deviceName";
+
+// Each browser has a persistent display name. No delete-name button is provided.
+if (localStorage.getItem(NAME_STORAGE_KEY) === null) {
+  localStorage.setItem(NAME_STORAGE_KEY, "anonymous");
+}
+$("deviceName").value = localStorage.getItem(NAME_STORAGE_KEY) || "anonymous";
+
+$("deviceName").addEventListener("input", () => {
+  const name = $("deviceName").value.trim().slice(0, 40) || "anonymous";
+  localStorage.setItem(NAME_STORAGE_KEY, name);
+});
+
+function getDeviceName() {
+  return (localStorage.getItem(NAME_STORAGE_KEY) || "anonymous").trim().slice(0, 40) || "anonymous";
+}
 
 function showPanel(name) {
   panels.forEach(id => $(id).classList.toggle("hidden", id !== name));
 }
 
-function status(id, msg, type = "") {
+function status(id, message, type = "") {
   const el = $(id);
-  el.textContent = msg;
+  el.textContent = message;
   el.className = "status " + type;
 }
 
@@ -257,29 +211,24 @@ function fromB64(s) {
 }
 
 async function deriveKey(code) {
-  const raw = await crypto.subtle.digest(
-    "SHA-256",
-    encoder.encode("CipherChat-v1:" + code)
-  );
-  return crypto.subtle.importKey("raw", raw, {name: "AES-GCM"}, false, ["encrypt", "decrypt"]);
+  const raw = await crypto.subtle.digest("SHA-256", encoder.encode("CipherChat-v1:" + code));
+  return crypto.subtle.importKey("raw", raw, {name:"AES-GCM"}, false, ["encrypt","decrypt"]);
 }
 
 async function encryptText(text) {
-  if (!activeCryptoKey) throw new Error("Unlock this room with its secret key before sending.");
+  if (!activeCryptoKey) throw new Error("Unlock this room before sending.");
   const iv = randomBytes(12);
-  const data = encoder.encode(text);
-  const cipher = await crypto.subtle.encrypt({name: "AES-GCM", iv}, activeCryptoKey, data);
-  return {iv: b64(iv), cipher: b64(new Uint8Array(cipher)), version: 1};
+  const cipher = await crypto.subtle.encrypt({name:"AES-GCM",iv}, activeCryptoKey, encoder.encode(text));
+  return {iv:b64(iv), cipher:b64(new Uint8Array(cipher)), version:1};
 }
 
-async function decryptText(item, key = activeCryptoKey) {
+async function decryptText(message, key = activeCryptoKey) {
   if (!key) return null;
   try {
-    if (item.version !== 1) return null;
     const plain = await crypto.subtle.decrypt(
-      {name: "AES-GCM", iv: fromB64(item.iv)},
+      {name:"AES-GCM",iv:fromB64(message.iv)},
       key,
-      fromB64(item.cipher)
+      fromB64(message.cipher)
     );
     return decoder.decode(plain);
   } catch {
@@ -324,12 +273,12 @@ function updateKeyUI() {
     ? "Write an encrypted message…"
     : "Unlock the room to send messages…";
   $("keyState").textContent = unlocked
-    ? "A key is loaded. Messages that match this key will be decrypted. You can lock the room to view ciphertext."
-    : "Viewing encrypted messages. Enter the secret key to decrypt messages and send messages.";
+    ? "A key is loaded. Messages matching this key will be decrypted."
+    : "Locked. Messages are shown as ciphertext.";
   $("unlockKey").value = activeKey || "";
 }
 
-function addCipherDetails(body, message) {
+function showCiphertext(body, message) {
   body.replaceChildren();
 
   const label = document.createElement("div");
@@ -344,7 +293,7 @@ function addCipherDetails(body, message) {
 
   const ivLabel = document.createElement("div");
   ivLabel.className = "cipher-label";
-  ivLabel.textContent = "INITIALIZATION VECTOR (IV)";
+  ivLabel.textContent = "IV";
   body.appendChild(ivLabel);
 
   const iv = document.createElement("div");
@@ -357,7 +306,7 @@ function renderMessages() {
   const box = $("chatMessages");
   const token = ++renderToken;
   const items = Object.values(currentMessages).sort(
-    (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0)
+    (a,b) => new Date(a.created_at || 0) - new Date(b.created_at || 0)
   );
 
   if (!items.length) {
@@ -373,60 +322,48 @@ function renderMessages() {
 
     const meta = document.createElement("div");
     meta.className = "meta";
-    meta.textContent = (message.created_at
-      ? new Date(message.created_at).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})
-      : "") + " · encrypted message";
+    const time = message.created_at
+      ? new Date(message.created_at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})
+      : "";
+    meta.textContent = (message.sender_name || "anonymous") + " · " + time;
 
     const body = document.createElement("div");
     body.className = "body";
-
     div.append(meta, body);
     box.appendChild(div);
 
     if (!activeCryptoKey) {
-      addCipherDetails(body, message);
+      showCiphertext(body, message);
       continue;
     }
 
     body.textContent = "Decrypting…";
-
-    decryptText({
-      iv: message.iv,
-      cipher: message.ciphertext,
-      version: 1
-    }).then(plaintext => {
+    decryptText({iv:message.iv,cipher:message.ciphertext}, activeCryptoKey).then(plaintext => {
       if (token !== renderToken || !body.isConnected) return;
-
       if (plaintext === null) {
-        addCipherDetails(body, message);
+        showCiphertext(body, message);
         const warning = document.createElement("div");
         warning.className = "cipher-label";
-        warning.textContent = "Could not decrypt with the current key.";
+        warning.textContent = "Could not decrypt with this key.";
         body.prepend(warning);
       } else {
         body.textContent = plaintext;
       }
-
       box.scrollTop = box.scrollHeight;
     });
   }
-
   box.scrollTop = box.scrollHeight;
 }
 
 async function refreshMessages(room) {
-  const {data, error} = await supabaseClient
+  const {data,error} = await supabaseClient
     .from("chat_messages")
-    .select("id,room_id,ciphertext,iv,created_at")
+    .select("id,room_id,ciphertext,iv,created_at,sender_name")
     .eq("room_id", room)
-    .order("created_at", {ascending: true});
+    .order("created_at", {ascending:true});
 
   if (error) throw error;
-
-  currentMessages = Object.fromEntries(
-    (data || []).map(message => [String(message.id), message])
-  );
-
+  currentMessages = Object.fromEntries((data || []).map(m => [String(m.id),m]));
   renderMessages();
 }
 
@@ -434,19 +371,11 @@ async function enterRoom(room, key = "") {
   room = room.trim();
   key = key.trim();
 
-  if (!/^\d{4}$/.test(room)) {
-    throw new Error("Room number must be exactly four digits.");
-  }
+  if (!/^\d{4}$/.test(room)) throw new Error("Room number must be exactly four digits.");
+  if (key && key.length < 20) throw new Error("That key looks incomplete. Paste the full key or leave it blank.");
 
-  if (key && key.length < 20) {
-    throw new Error("That key looks incomplete. Paste the entire key code, or leave it blank.");
-  }
-
-  const {data: roomRow, error: roomError} = await supabaseClient
-    .from("chat_rooms")
-    .select("room_id")
-    .eq("room_id", room)
-    .maybeSingle();
+  const {data:roomRow,error:roomError} = await supabaseClient
+    .from("chat_rooms").select("room_id").eq("room_id",room).maybeSingle();
 
   if (roomError) throw new Error("Supabase error: " + roomError.message);
   if (!roomRow) throw new Error("That room doesn't exist. Check the room number.");
@@ -456,69 +385,52 @@ async function enterRoom(room, key = "") {
   activeKey = key || null;
   activeCryptoKey = key ? await deriveKey(key) : null;
   currentMessages = {};
-
   $("chatRoomId").textContent = room;
   updateKeyUI();
   showPanel("chatPanel");
   $("chatMessages").innerHTML = '<div class="empty">Loading messages…</div>';
 
-  try {
-    await refreshMessages(room);
-  } catch (error) {
-    throw new Error("Couldn't load messages: " + error.message);
-  }
+  await refreshMessages(room);
 
-  messageChannel = supabaseClient
-    .channel("cipher-chat-room-" + room)
-    .on(
-      "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "chat_messages",
-        filter: "room_id=eq." + room
-      },
-      payload => {
-        if (payload.eventType === "INSERT" && payload.new) {
-          currentMessages[String(payload.new.id)] = payload.new;
-          renderMessages();
-        } else {
-          refreshMessages(room).catch(error =>
-            status("chatStatus", "Realtime update error: " + error.message, "error")
-          );
-        }
+  messageChannel = supabaseClient.channel("cipher-chat-room-" + room)
+    .on("postgres_changes", {
+      event:"*",schema:"public",table:"chat_messages",filter:"room_id=eq." + room
+    }, payload => {
+      if (payload.eventType === "INSERT" && payload.new) {
+        currentMessages[String(payload.new.id)] = payload.new;
+        renderMessages();
+      } else {
+        refreshMessages(room).catch(err => status("chatStatus","Realtime error: " + err.message,"error"));
       }
-    )
+    })
     .subscribe(state => {
       if (state === "CHANNEL_ERROR" || state === "TIMED_OUT") {
-        status(
-          "chatStatus",
-          "Realtime connection issue. Check that Supabase Realtime is enabled for chat_messages.",
-          "error"
-        );
+        status("chatStatus","Realtime connection issue. Check Supabase Realtime settings.","error");
       }
     });
 
-  status(
-    "chatStatus",
-    key
-      ? "Joined room. Messages that match your key will decrypt."
-      : "Joined room. You can view encrypted messages without a key.",
-    "good"
-  );
+  status("chatStatus", key ? "Joined room." : "Joined publicly. You can view ciphertext without a key.", "good");
 }
+
+$("toggleSettings").onclick = () => {
+  const opening = $("settingsPanel").classList.contains("hidden");
+  $("settingsPanel").classList.toggle("hidden", !opening);
+  $("toggleSettings").setAttribute("aria-expanded", String(opening));
+  $("toggleSettings").textContent = opening
+    ? "⚙ Room settings and encryption ▴"
+    : "⚙ Room settings and encryption ▾";
+};
 
 $("showCreate").onclick = () => {
   showPanel("createPanel");
-  status("createStatus", "");
+  status("createStatus","");
   $("createdDetails").classList.add("hidden");
   $("createRoomBtn").classList.remove("hidden");
 };
 
 $("showJoin").onclick = () => {
   showPanel("joinPanel");
-  status("joinStatus", "");
-
+  status("joinStatus","");
   const room = localStorage.getItem("cipherchat:lastRoom");
   if (room) {
     $("joinRoomId").value = room;
@@ -527,100 +439,73 @@ $("showJoin").onclick = () => {
   }
 };
 
-document.querySelectorAll("[data-back]").forEach(button => {
-  button.onclick = () => showPanel("home");
-});
+document.querySelectorAll("[data-back]").forEach(b => b.onclick = () => showPanel("home"));
 
 $("createRoomBtn").onclick = async () => {
-  const button = $("createRoomBtn");
-  button.disabled = true;
-  status("createStatus", "Creating room in Supabase…");
+  const btn = $("createRoomBtn");
+  btn.disabled = true;
+  status("createStatus","Creating room…");
 
   try {
     let chosen = null;
-
-    for (let attempt = 0; attempt < 40; attempt++) {
-      const candidate = String(
-        crypto.getRandomValues(new Uint16Array(1))[0] % 10000
-      ).padStart(4, "0");
-
-      const {error} = await supabaseClient
-        .from("chat_rooms")
-        .insert({room_id: candidate});
-
-      if (!error) {
-        chosen = candidate;
-        break;
-      }
-
+    for (let attempt=0; attempt<40; attempt++) {
+      const candidate = String(crypto.getRandomValues(new Uint16Array(1))[0] % 10000).padStart(4,"0");
+      const {error} = await supabaseClient.from("chat_rooms").insert({room_id:candidate});
+      if (!error) { chosen = candidate; break; }
       if (error.code !== "23505") throw new Error(error.message);
     }
-
-    if (!chosen) throw new Error("Couldn't find an unused room number. Try again later.");
+    if (!chosen) throw new Error("Couldn't find an unused room number. Try again.");
 
     const key = hex(randomBytes(32));
     $("newRoomId").textContent = chosen;
     $("newKey").textContent = key;
     $("createdDetails").classList.remove("hidden");
-    button.classList.add("hidden");
+    btn.classList.add("hidden");
 
-    $("copyKey").onclick = () => copy(key, "createStatus");
-    $("copyDetails").onclick = () =>
-      copy("Cipher Chat room: " + chosen + "\nKey code: " + key, "createStatus");
+    $("copyKey").onclick = () => copy(key,"createStatus");
+    $("copyDetails").onclick = () => copy("Cipher Chat room: " + chosen + "\nKey code: " + key,"createStatus");
 
     $("saveNewKey").onchange = () => {
-      if ($("saveNewKey").checked) saveKey(chosen, key);
+      if ($("saveNewKey").checked) saveKey(chosen,key);
       else removeSavedKey(chosen);
     };
 
-    if ($("saveNewKey").checked) saveKey(chosen, key);
+    if ($("saveNewKey").checked) saveKey(chosen,key);
     else removeSavedKey(chosen);
 
     $("openCreatedRoom").onclick = async () => {
-      try {
-        await enterRoom(chosen, key);
-      } catch (error) {
-        status("createStatus", error.message, "error");
-      }
+      try { await enterRoom(chosen,key); }
+      catch (e) { status("createStatus",e.message,"error"); }
     };
-
-    status("createStatus", "Room created. Share the room number publicly if you like; share the key privately.", "good");
-  } catch (error) {
-    status("createStatus", error.message || "Could not create the room.", "error");
+    status("createStatus","Room created. Keep the key private.","good");
+  } catch (e) {
+    status("createStatus",e.message || "Could not create the room.","error");
   } finally {
-    button.disabled = false;
+    btn.disabled = false;
   }
 };
 
-$("joinForm").onsubmit = async event => {
-  event.preventDefault();
-  status("joinStatus", "Joining room…");
-
+$("joinForm").onsubmit = async e => {
+  e.preventDefault();
+  status("joinStatus","Joining room…");
   const room = $("joinRoomId").value.trim();
   const key = $("joinKey").value.trim();
 
   try {
-    await enterRoom(room, key);
-
-    if (key && $("saveJoinKey").checked) {
-      saveKey(room, key);
-    } else if (!key || !$("saveJoinKey").checked) {
-      removeSavedKey(room);
-    }
-  } catch (error) {
-    status("joinStatus", error.message || "Couldn't join room.", "error");
+    await enterRoom(room,key);
+    if (key && $("saveJoinKey").checked) saveKey(room,key);
+    else if (!key || !$("saveJoinKey").checked) removeSavedKey(room);
+  } catch (err) {
+    status("joinStatus",err.message || "Couldn't join room.","error");
   }
 };
 
-$("unlockForm").onsubmit = async event => {
-  event.preventDefault();
-
+$("unlockButton").onclick = async () => {
   if (!activeRoom) return;
-
   const key = $("unlockKey").value.trim();
 
   if (!key || key.length < 20) {
-    status("chatStatus", "Enter the full secret key, or leave it blank to view ciphertext.", "error");
+    status("keyState","Enter the full key, or leave it blank to view ciphertext.","error");
     return;
   }
 
@@ -629,43 +514,27 @@ $("unlockForm").onsubmit = async event => {
 
   try {
     const candidateKey = await deriveKey(key);
-
-    // Verify the key against an existing message before accepting it.
     const messages = Object.values(currentMessages);
 
     if (messages.length) {
       let verified = false;
-
       for (const message of messages) {
-        const plaintext = await decryptText(
-          {iv: message.iv, cipher: message.ciphertext, version: 1},
-          candidateKey
-        );
-
-        if (plaintext !== null) {
-          verified = true;
-          break;
-        }
+        const plain = await decryptText({iv:message.iv,cipher:message.ciphertext},candidateKey);
+        if (plain !== null) { verified = true; break; }
       }
-
-      if (!verified) {
-        throw new Error("This key couldn't decrypt any message in this room. Check the key.");
-      }
+      if (!verified) throw new Error("This key could not decrypt any message. Check it and try again.");
     }
 
     activeKey = key;
     activeCryptoKey = candidateKey;
     updateKeyUI();
     renderMessages();
-    status(
-      "chatStatus",
-      messages.length
-        ? "Key accepted. Messages that match this key are now readable."
-        : "Key loaded. Messages sent with this key will be readable.",
-      "good"
-    );
+    status("keyState",messages.length ? "Key accepted. Matching messages are decrypted." : "Key loaded. New messages using this key can be decrypted.","good");
+    if ($("saveJoinKey")) {
+      // Key saving is controlled by the browser's existing save-key checkbox when joining.
+    }
   } catch (error) {
-    status("chatStatus", error.message || "Couldn't unlock the room.", "error");
+    status("keyState",error.message || "Couldn't unlock the room.","error");
   } finally {
     button.disabled = false;
   }
@@ -676,19 +545,17 @@ $("lockMessages").onclick = () => {
   activeCryptoKey = null;
   updateKeyUI();
   renderMessages();
-  status("chatStatus", "Locked. Viewing encrypted ciphertext.", "good");
+  status("keyState","Locked. Viewing encrypted ciphertext.","good");
 };
 
-$("sendForm").onsubmit = async event => {
-  event.preventDefault();
-
+$("sendForm").onsubmit = async e => {
+  e.preventDefault();
   const input = $("messageInput");
   const text = input.value.trim();
-
   if (!text || !activeRoom) return;
 
   if (!activeCryptoKey) {
-    status("chatStatus", "Unlock the room with its secret key before sending.", "error");
+    status("chatStatus","Unlock the room before sending messages.","error");
     return;
   }
 
@@ -697,21 +564,18 @@ $("sendForm").onsubmit = async event => {
 
   try {
     const encrypted = await encryptText(text);
-
-    const {error} = await supabaseClient
-      .from("chat_messages")
-      .insert({
-        room_id: activeRoom,
-        ciphertext: encrypted.cipher,
-        iv: encrypted.iv
-      });
+    const {error} = await supabaseClient.from("chat_messages").insert({
+      room_id:activeRoom,
+      ciphertext:encrypted.cipher,
+      iv:encrypted.iv,
+      sender_name:getDeviceName()
+    });
 
     if (error) throw error;
-
     input.value = "";
-    status("chatStatus", "Encrypted message sent.", "good");
-  } catch (error) {
-    status("chatStatus", "Couldn't send message: " + error.message, "error");
+    status("chatStatus","Encrypted message sent.","good");
+  } catch (err) {
+    status("chatStatus","Couldn't send message: " + err.message,"error");
   } finally {
     button.disabled = !activeCryptoKey;
     input.focus();
@@ -728,24 +592,9 @@ $("leaveRoom").onclick = () => {
   showPanel("home");
 };
 
-$("copyRoom").onclick = () => {
-  if (activeRoom) copy(activeRoom, "chatStatus");
-};
-
-$("forgetKey").onclick = () => {
-  if (!activeRoom) return;
-
-  removeSavedKey(activeRoom);
-  $("unlockKey").value = "";
-  status("chatStatus", "Saved key removed from this device. The room remains publicly viewable.", "good");
-};
-
-$("joinRoomId").addEventListener("input", event => {
-  event.target.value = event.target.value.replace(/\D/g, "").slice(0, 4);
-});
-
-$("joinKey").addEventListener("input", () => {
-  if (!$("joinKey").value.trim()) $("saveJoinKey").checked = false;
+$("copyRoom").onclick = () => { if (activeRoom) copy(activeRoom,"chatStatus"); };
+$("joinRoomId").addEventListener("input",e => {
+  e.target.value = e.target.value.replace(/\D/g,"").slice(0,4);
 });
 </script>
 </body>
