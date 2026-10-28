@@ -63,45 +63,27 @@ footer{text-align:center;color:#64718a;font-size:11px;padding:24px 0 0}
 <div class="room-head"><div><div class="sub" style="margin:0 0 4px">ROOM NUMBER</div><div id="chatRoomId" class="room-id"></div></div><div class="room-tools"><button id="copyRoom">Copy room ID</button><button id="forgetKey" class="btn-quiet">Forget saved key</button></div></div>
 <div id="chatMessages" class="chatbox" aria-live="polite"><div class="empty">Loading encrypted messages…</div></div>
 <form id="sendForm" class="compose"><textarea id="messageInput" maxlength="4000" rows="1" placeholder="Write an encrypted message…" required></textarea><button class="btn-primary" type="submit">Send ↗</button></form>
-<div class="security"><span>●</span><div>Encrypted in your browser using AES-256-GCM. The key is never sent to Firebase.</div></div>
+<div class="security"><span>●</span><div>Encrypted in your browser using AES-256-GCM. Your room key is never sent to Supabase.</div></div>
 <div id="chatStatus" class="status" role="status"></div>
 </section>
 </main>
 <footer>Cipher Chat · Built for private conversations</footer>
 </div>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* STEP 1: Replace these placeholder values with your Firebase web app config. */
-const firebaseConfig = {
-  apiKey: "PASTE_YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_FIREBASE_APP_ID"
-};
+/* Cipher Chat uses Supabase for storage/realtime and Web Crypto for end-to-end encryption. */
+const SUPABASE_URL = "https://vwriqbeupkkmsilinalz.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_aVu3Q53R8H4XlJ2NdHCNEQ_n9uFclNH";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 const $ = id => document.getElementById(id);
 const panels = ["home","createPanel","joinPanel","chatPanel"];
-let db=null, auth=null, activeRoom=null, activeKey=null, activeCryptoKey=null, messageListener=null, activeRef=null, currentMessages={};
-let firebaseReady=false;
+let activeRoom=null, activeKey=null, activeCryptoKey=null, messageChannel=null, currentMessages={};
 const encoder = new TextEncoder(), decoder = new TextDecoder();
 function showPanel(name){panels.forEach(id=>$(id).classList.toggle("hidden",id!==name));}
 function status(id,msg,type=""){const el=$(id);el.textContent=msg;el.className="status "+type;}
-function configIsSet(){return firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith("PASTE_") && firebaseConfig.projectId && !firebaseConfig.projectId.startsWith("YOUR_");}
-async function initFirebase(){
-  if(firebaseReady)return;
-  if(!configIsSet())throw new Error("Firebase isn't configured yet. Follow the setup instructions below in index.html.");
-  if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-  auth=firebase.auth();db=firebase.database();
-  await auth.signInAnonymously();
-  firebaseReady=true;
-}
 function randomBytes(n){const a=new Uint8Array(n);crypto.getRandomValues(a);return a;}
 function hex(bytes){return [...bytes].map(x=>x.toString(16).padStart(2,"0")).join("");}
-function b64(bytes){let s="";bytes.forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");}
+function b64(bytes){let s="";bytes.forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");}
 async function deriveKey(code){
   const raw=await crypto.subtle.digest("SHA-256",encoder.encode("CipherChat-v1:"+code));
   return crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["encrypt","decrypt"]);
@@ -119,55 +101,64 @@ async function decryptText(item){
     return decoder.decode(plain);
   }catch{return "[Unable to decrypt this message — check the room key]";}
 }
-function saveKey(room,key){localStorage.setItem("cipherchat:key:"+room,key);}
-function removeSavedKey(room){localStorage.removeItem("cipherchat:key:"+room);}
-async function copy(text, statusId){
+function saveKey(room,key){localStorage.setItem("cipherchat:key:"+room,key);localStorage.setItem("cipherchat:lastRoom",room);}
+function removeSavedKey(room){localStorage.removeItem("cipherchat:key:"+room);if(localStorage.getItem("cipherchat:lastRoom")===room)localStorage.removeItem("cipherchat:lastRoom");}
+async function copy(text,statusId){
   try{await navigator.clipboard.writeText(text);if(statusId)status(statusId,"Copied to clipboard.","good");}
   catch{prompt("Copy this text:",text);}
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function clearListener(){if(activeRef&&messageListener)activeRef.off("value",messageListener);activeRef=null;messageListener=null;}
+function clearListener(){if(messageChannel){supabaseClient.removeChannel(messageChannel);messageChannel=null;}}
 function renderMessages(){
   const box=$("chatMessages");
-  const items=Object.entries(currentMessages).sort((a,b)=>(a[1].createdAt||0)-(b[1].createdAt||0));
+  const items=Object.entries(currentMessages).sort((a,b)=>new Date(a[1].created_at||0)-new Date(b[1].created_at||0));
   if(!items.length){box.innerHTML='<div class="empty">No messages yet. Say hello.</div>';return;}
   box.innerHTML="";
   for(const [id,m] of items){
     const div=document.createElement("div");div.className="message";
-    const time=m.createdAt?new Date(m.createdAt).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
+    const time=m.created_at?new Date(m.created_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"";
     div.innerHTML='<div class="meta">'+escapeHtml(time)+' · encrypted message</div><div class="body">Decrypting…</div>';
     box.appendChild(div);
-    decryptText(m).then(text=>{div.querySelector(".body").textContent=text;box.scrollTop=box.scrollHeight;});
+    decryptText({iv:m.iv,cipher:m.ciphertext,version:1}).then(text=>{div.querySelector(".body").textContent=text;box.scrollTop=box.scrollHeight;});
   }
   box.scrollTop=box.scrollHeight;
+}
+async function refreshMessages(room){
+  const {data,error}=await supabaseClient.from("chat_messages").select("id,room_id,ciphertext,iv,created_at").eq("room_id",room).order("created_at",{ascending:true});
+  if(error)throw error;
+  currentMessages=Object.fromEntries((data||[]).map(m=>[String(m.id),m]));
+  renderMessages();
 }
 async function enterRoom(room,key){
   if(!/^\d{4}$/.test(room))throw new Error("Room number must be exactly four digits.");
   if(!key||key.length<20)throw new Error("That key code looks incomplete. Use the entire key code.");
-  await initFirebase();
-  const roomSnap=await db.ref("rooms/"+room+"/createdAt").once("value");
-  if(!roomSnap.exists())throw new Error("That room doesn't exist. Check the room number.");
+  const {data:roomRow,error:roomError}=await supabaseClient.from("chat_rooms").select("room_id").eq("room_id",room).maybeSingle();
+  if(roomError)throw new Error("Supabase error: "+roomError.message);
+  if(!roomRow)throw new Error("That room doesn't exist. Check the room number.");
   activeRoom=room;activeKey=key;activeCryptoKey=await deriveKey(key);
   $("chatRoomId").textContent=room;currentMessages={};clearListener();
-  activeRef=db.ref("rooms/"+room+"/messages");
-  messageListener=snap=>{currentMessages=snap.val()||{};renderMessages();};
-  activeRef.on("value",messageListener,err=>status("chatStatus","Database error: "+err.message,"error"));
-  showPanel("chatPanel");status("chatStatus","Connected. Your messages are encrypted on this device.","good");
+  await refreshMessages(room);
+  messageChannel=supabaseClient.channel("cipher-chat-room-"+room)
+    .on("postgres_changes",{event:"*",schema:"public",table:"chat_messages",filter:"room_id=eq."+room},payload=>{
+      if(payload.eventType==="INSERT"&&payload.new){currentMessages[String(payload.new.id)]=payload.new;renderMessages();}
+      else refreshMessages(room).catch(err=>status("chatStatus","Realtime update error: "+err.message,"error"));
+    }).subscribe((state)=>{
+      if(state==="CHANNEL_ERROR"||state==="TIMED_OUT")status("chatStatus","Realtime connection issue. Check Supabase Realtime is enabled for chat_messages.","error");
+    });
+  showPanel("chatPanel");status("chatStatus","Connected. Messages are encrypted on this device.","good");
 }
 $("showCreate").onclick=()=>{showPanel("createPanel");status("createStatus","");$("createdDetails").classList.add("hidden");$("createRoomBtn").classList.remove("hidden");};
 $("showJoin").onclick=()=>{showPanel("joinPanel");status("joinStatus","");};
 document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>showPanel("home"));
 $("createRoomBtn").onclick=async()=>{
-  const btn=$("createRoomBtn");btn.disabled=true;status("createStatus","Connecting securely to Firebase…");
+  const btn=$("createRoomBtn");btn.disabled=true;status("createStatus","Creating room in Supabase…");
   try{
-    await initFirebase();
     let chosen=null;
-    // A transaction atomically reserves a room ID, preventing simultaneous room collisions.
     for(let attempt=0;attempt<40;attempt++){
       const candidate=String(crypto.getRandomValues(new Uint16Array(1))[0]%10000).padStart(4,"0");
-      const ref=db.ref("rooms/"+candidate);
-      const result=await ref.transaction(existing=>existing===null?{createdAt:firebase.database.ServerValue.TIMESTAMP,messages:{}}:undefined,{applyLocally:false});
-      if(result.committed){chosen=candidate;break;}
+      const {error}=await supabaseClient.from("chat_rooms").insert({room_id:candidate});
+      if(!error){chosen=candidate;break;}
+      if(error.code!=="23505")throw new Error(error.message);
     }
     if(!chosen)throw new Error("Couldn't find an unused room number. Try again later.");
     const key=hex(randomBytes(32));
@@ -185,10 +176,8 @@ $("createRoomBtn").onclick=async()=>{
 $("joinForm").onsubmit=async e=>{
   e.preventDefault();status("joinStatus","Joining room…");
   const room=$("joinRoomId").value.trim(),key=$("joinKey").value.trim();
-  try{
-    await enterRoom(room,key);
-    if($("saveJoinKey").checked)saveKey(room,key);else removeSavedKey(room);
-  }catch(err){status("joinStatus",err.message||"Couldn't join room.","error");}
+  try{await enterRoom(room,key);if($("saveJoinKey").checked)saveKey(room,key);else removeSavedKey(room);}
+  catch(err){status("joinStatus",err.message||"Couldn't join room.","error");}
 };
 $("saveJoinKey").onchange=()=>{if(!$("saveJoinKey").checked){const room=$("joinRoomId").value.trim();if(/^\d{4}$/.test(room))removeSavedKey(room);}};
 $("sendForm").onsubmit=async e=>{
@@ -196,19 +185,16 @@ $("sendForm").onsubmit=async e=>{
   const btn=e.submitter;btn.disabled=true;
   try{
     const encrypted=await encryptText(text);
-    await db.ref("rooms/"+activeRoom+"/messages").push({...encrypted,createdAt:firebase.database.ServerValue.TIMESTAMP});
+    const {error}=await supabaseClient.from("chat_messages").insert({room_id:activeRoom,ciphertext:encrypted.cipher,iv:encrypted.iv});
+    if(error)throw error;
     input.value="";status("chatStatus","Message sent securely.","good");
   }catch(err){status("chatStatus","Couldn't send message: "+err.message,"error");}
   finally{btn.disabled=false;input.focus();}
 };
 $("leaveRoom").onclick=()=>{clearListener();activeRoom=null;activeKey=null;activeCryptoKey=null;currentMessages={};showPanel("home");};
 $("copyRoom").onclick=()=>copy(activeRoom);
-$("forgetKey").onclick=()=>{
-  if(activeRoom)removeSavedKey(activeRoom);
-  status("chatStatus","Saved key removed from this device. This room remains available if you have the key code.","good");
-};
+$("forgetKey").onclick=()=>{if(activeRoom)removeSavedKey(activeRoom);status("chatStatus","Saved key removed from this device. This room remains available if you have the key code.","good");};
 $("joinRoomId").addEventListener("input",e=>{e.target.value=e.target.value.replace(/\D/g,"").slice(0,4);});
-/* Load a previously saved key only after the user chooses Join Room. */
 $("showJoin").addEventListener("click",()=>{
   const room=localStorage.getItem("cipherchat:lastRoom");
   if(room){const key=localStorage.getItem("cipherchat:key:"+room);if(key){$("joinRoomId").value=room;$("joinKey").value=key;$("saveJoinKey").checked=true;}}
