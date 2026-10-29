@@ -1,888 +1,119 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111318">
-  <title>Cipher Chat</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      color-scheme: dark;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #111318;
-      color: #f0f0f2;
-      --panel: #191b22;
-      --border: #30323b;
-      --muted: #9b9da8;
-      --button: #292b34;
-      --accent: #b8c5ff;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111318">
+<title>Cipher Chat</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js" type="module"></script>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#111318;color:#f0f0f2;--panel:#191b22;--border:#30323b;--muted:#9b9da8;--button:#292b34;--accent:#b8c5ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column}button,input,textarea{font:inherit}
+button{color:#eeeef2;background:var(--button);border:1px solid var(--border);border-radius:10px;padding:10px 15px;cursor:pointer;transition:background .15s,border-color .15s}button:hover:not(:disabled){background:#363944;border-color:#555866}button:disabled{opacity:.45;cursor:not-allowed}
+input,textarea{width:100%;color:#f0f0f2;background:#111318;border:1px solid var(--border);border-radius:10px;padding:12px;outline:none}input:focus,textarea:focus{border-color:#777fba}textarea{resize:none;min-height:44px;max-height:150px;line-height:1.5}
+.topbar{border-bottom:1px solid var(--border);padding:20px 24px}.topbar-inner{width:min(100%,1050px);margin:auto}h1{font-size:23px;margin:0;letter-spacing:-.5px}h2{font-size:21px;margin:0 0 10px}h3{font-size:15px;margin:0 0 10px}.subtitle,.muted,.hint{color:var(--muted);font-size:13px;line-height:1.6}.subtitle{margin-top:4px}
+main{width:min(100% - 32px,850px);margin:0 auto;padding:36px 0;flex:1}.panel{background:var(--panel);border:1px solid var(--border);border-radius:15px;padding:22px}.stack{display:flex;flex-direction:column;gap:15px}.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.row>.grow{flex:1;min-width:160px}.hidden{display:none!important}.field{display:flex;flex-direction:column;gap:7px}label{font-size:13px;color:#c7c8d0}.primary{background:#dfe4ff;color:#161823;border-color:#dfe4ff;font-weight:650}.primary:hover:not(:disabled){background:#c7d0ff;border-color:#c7d0ff}.divider{border:0;border-top:1px solid var(--border);margin:5px 0}.home-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.home-actions button{min-height:54px;font-weight:600}.room-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.room-id{font-size:24px;font-weight:750;letter-spacing:3px}.status{color:#c3c8da;font-size:13px;line-height:1.6;padding:10px 12px;border-radius:9px;background:#222530;overflow-wrap:anywhere}.messages{min-height:230px;max-height:52vh;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:15px 0}.empty{color:var(--muted);text-align:center;margin:auto;padding:45px 10px;font-size:14px}.day-divider{display:flex;align-items:center;gap:10px;color:#858792;font-size:12px;font-weight:600;white-space:nowrap;margin:8px 0}.day-divider:before,.day-divider:after{content:"";height:1px;background:#303138;flex:1}.message{display:flex;align-items:flex-start;gap:11px;max-width:100%;padding:4px 2px;background:transparent;border:0;border-radius:0;min-width:0}.message.own-message{flex-direction:row-reverse}.avatar{width:42px;height:42px;flex:0 0 42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#515a70,#252a37);border:1px solid #62697a;color:#f4f4fa;font-weight:750;font-size:14px;overflow:hidden}.avatar.silhouette{background:#30323b;color:#bfc2cc;font-size:25px;font-weight:400}.message-content{min-width:0;flex:1;padding-top:1px}.message.own-message .message-content{text-align:right}.message-top{display:flex;justify-content:flex-start;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:5px}.message.own-message .message-top{justify-content:flex-end}.sender{font-size:13px;font-weight:750;overflow-wrap:anywhere;color:#e4e5ed}.time{font-size:11px;color:var(--muted)}.message-body{overflow-wrap:anywhere;white-space:pre-wrap;line-height:1.55;font-size:14px;color:#e0e1e7}.audio-player{display:block;width:min(100%,360px);height:38px;filter:grayscale(1)}.ciphertext{color:#b7bdcf;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+/* Discord-like composer */
+.composer-shell{position:relative;display:flex;align-items:flex-end;gap:10px;background:#222329;border:1px solid #303138;border-radius:13px;padding:8px 10px;min-height:58px}.composer-shell:focus-within{border-color:#4b4d58}.attach-button,.emoji-button,.audio-button{flex:0 0 34px;width:34px;height:38px;padding:0;border:0;background:transparent;color:#a7a8b0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;line-height:1}.attach-button:hover:not(:disabled),.emoji-button:hover:not(:disabled),.audio-button:hover:not(:disabled){background:#34353d;color:#d0d0d5}.composer-shell textarea{flex:1;min-width:0;min-height:38px;max-height:150px;border:0;background:transparent;padding:8px 2px;color:#e7e7eb;outline:none;box-shadow:none}.composer-shell textarea:focus{border:0}.composer-shell textarea::placeholder{color:#92939d}.emoji-button{font-size:17px;flex-basis:28px;width:28px;height:34px;filter:none;transition:transform .12s,color .12s,background .12s}.emoji-button svg,.audio-button svg{width:21px;height:21px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}.emoji-button{color:#a7a8b0}.emoji-button:hover:not(:disabled){color:#c084fc;background:#34353d}.emoji-button.picker-open{color:#ff77c8;background:#3a2938;box-shadow:0 0 0 1px #ff77c855}.audio-button svg{width:22px;height:22px}.audio-button:hover:not(:disabled){color:#8ca0ff}.audio-button.recording svg{color:#ff7777}.audio-button{font-size:20px;color:#a7a8b0;padding:0;border:0;background:transparent;border-radius:8px;display:flex;align-items:center;justify-content:center}.recording-action{height:34px;min-width:34px;padding:0 10px;border-radius:9px;font-size:14px;font-weight:700}.recording-send{background:#2c9b69;color:#fff;border-color:#2c9b69}.recording-delete{background:#a7354c;color:#fff;border-color:#a7354c}.voice-wave{display:inline-flex;align-items:center;justify-content:center;gap:3px;width:78px;height:24px;vertical-align:middle}.voice-wave i{display:block;height:3px;width:100%;border-radius:3px;background:#8fa4ff}.voice-wave i:nth-child(2){height:5px}.attachment:hover .voice-wave i{animation:voice-line .55s ease-in-out infinite alternate}.attachment:hover .voice-wave i:nth-child(2){animation-delay:.12s}.attachment:hover .voice-wave i:nth-child(3){animation-delay:.24s}@keyframes voice-line{from{transform:scaleY(1)}to{transform:scaleY(3.5)}}.voice-title{display:inline-flex;align-items:center;gap:9px}.voice-label{display:inline-block}.voice-hover-wave{display:none}.attachment:hover .voice-label{display:none}.attachment:hover .voice-hover-wave{display:inline-flex}.audio-button.recording{color:#ff7777;background:#45272b}.waveform{flex:1;min-width:0;height:38px;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0 8px}.waveform-bar{width:3px;height:3px;min-width:2px;max-width:14px;border-radius:3px;background:#c5c8d2;transition:width .06s;flex:0 0 auto}.recording-label{font-size:12px;color:#e0a0a0;white-space:nowrap}.recording-wave-bar{width:5px;height:10px;min-width:5px;max-width:5px;background:#c5c8d2;transform-origin:center;transition:transform .08s}.recording-wave-bar-1,.recording-wave-bar-3{height:9px}.recording-wave-bar-2{height:20px}.emoji-button:hover{transform:scale(1.08)}.emoji-picker{position:absolute;right:8px;bottom:65px;z-index:10;width:min(352px,calc(100vw - 50px));height:435px;background:#202127;border:1px solid #393a44;border-radius:12px;box-shadow:0 10px 30px #0008;overflow:hidden}.emoji-picker emoji-picker{width:100%;height:100%;--background:#202127;--border-color:#393a44;--input-border-color:#393a44;--input-font-color:#f0f0f2;--input-placeholder-color:#9b9da8;--button-hover-background:#393a44;--category-emoji-size:20px;--emoji-size:24px;--indicator-color:#8ca0ff;--outline-color:#8ca0ff;--category-font-color:#c7c8d0;--text-color:#f0f0f2}.file-input{display:none}.file-chip{position:relative;display:block;padding:14px;background:#222530;border:1px solid var(--border);border-radius:12px;font-size:13px}.file-preview-top{display:flex;justify-content:flex-end;gap:6px;margin-bottom:8px}.file-tool{width:32px;height:32px;padding:0;display:grid;place-items:center;background:#30333e;border:1px solid #4a4d59;font-size:16px}.file-tool.spoiler-on{background:#7763b5;border-color:#a995f5}.file-tool.delete-file{color:#ff7b86;background:#46252c;border-color:#813b49}.file-preview-content{display:flex;align-items:center;gap:12px;min-width:0}.file-preview-thumb{width:76px;height:76px;flex:0 0 76px;object-fit:cover;border-radius:9px;background:#171920;border:1px solid #3c3f4b}.file-preview-placeholder{display:grid;place-items:center;font-size:30px;color:#bfc5db}.file-preview-meta{min-width:0;flex:1}.file-chip .file-name{display:block;overflow-wrap:anywhere;font-weight:650}.file-description-preview{color:var(--muted);margin-top:4px;overflow-wrap:anywhere}.file-spoiler-overlay{position:absolute;inset:52px 14px 14px;display:grid;place-items:center;background:#101116eF;border-radius:9px;color:#fff;font-weight:700;letter-spacing:.4px;pointer-events:none}.file-edit-dialog{position:fixed;inset:0;z-index:50;background:#000a;display:grid;place-items:center;padding:18px}.file-edit-card{width:min(440px,100%);background:#1b1d25;border:1px solid #424552;border-radius:15px;padding:20px;box-shadow:0 20px 70px #0009}.file-edit-card h3{font-size:18px;margin-bottom:16px}.file-edit-card .field{margin-bottom:13px}.file-edit-card textarea{min-height:90px}.file-edit-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.attachment{display:inline-flex;align-items:center;gap:10px;border:1px solid #424450;background:#252832;padding:10px 12px;border-radius:10px;color:#e4e5ec;text-decoration:none;max-width:100%}.attachment:hover{background:#30333e}.attachment-icon{font-size:22px;filter:grayscale(1)}.attachment-name{overflow-wrap:anywhere}.error{color:#ffaaaa}.success{color:#b6e7c5}details summary{cursor:pointer;color:#dedfe7;font-size:14px}details[open] summary{margin-bottom:17px}.settings-grid{display:grid;gap:15px}.inline-row{gap:8px}.inline-checkbox{width:auto;margin:0}.composer-hint{margin-top:7px}footer{text-align:center;color:#777983;font-size:12px;padding:20px;border-top:1px solid var(--border)}
+@media(max-width:520px){.topbar{padding:17px 16px}main{width:min(100% - 22px,850px);padding:22px 0}.panel{padding:16px}.home-actions{grid-template-columns:1fr}.messages{max-height:50vh}.composer-shell{gap:6px;padding:7px}.attach-button,.emoji-button,.audio-button{flex-basis:30px;width:30px}}
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    button, input, textarea { font: inherit; }
-
-    button {
-      color: #f0f0f2;
-      background: var(--button);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 11px 16px;
-      cursor: pointer;
-      transition: background .15s, border-color .15s;
-    }
-
-    button:hover:not(:disabled) {
-      background: #363944;
-      border-color: #555866;
-    }
-
-    button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-
-    input, textarea {
-      width: 100%;
-      color: #f0f0f2;
-      background: #111318;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      outline: none;
-    }
-
-    input:focus, textarea:focus {
-      border-color: #777fba;
-    }
-
-    textarea {
-      resize: none;
-      min-height: 46px;
-      max-height: 150px;
-      line-height: 1.5;
-    }
-
-    .topbar {
-      border-bottom: 1px solid var(--border);
-      padding: 20px 24px;
-    }
-
-    .topbar-inner {
-      width: min(100%, 1050px);
-      margin: auto;
-    }
-
-    h1 { font-size: 23px; margin: 0; letter-spacing: -.5px; }
-    h2 { font-size: 21px; margin: 0 0 10px; }
-    h3 { font-size: 15px; margin: 0 0 10px; }
-
-    .subtitle, .muted, .hint {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .subtitle { margin-top: 4px; }
-
-    main {
-      width: min(100% - 32px, 850px);
-      margin: 0 auto;
-      padding: 36px 0;
-      flex: 1;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 15px;
-      padding: 22px;
-    }
-
-    .stack { display: flex; flex-direction: column; gap: 15px; }
-    .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .row > .grow { flex: 1; min-width: 160px; }
-    .hidden { display: none !important; }
-    .field { display: flex; flex-direction: column; gap: 7px; }
-    label { font-size: 13px; color: #c7c8d0; }
-
-    .primary {
-      background: #dfe4ff;
-      color: #161823;
-      border-color: #dfe4ff;
-      font-weight: 650;
-    }
-
-    .primary:hover:not(:disabled) {
-      background: #c7d0ff;
-      border-color: #c7d0ff;
-    }
-
-    .divider { border: 0; border-top: 1px solid var(--border); margin: 5px 0; }
-
-    .home-actions {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .home-actions button {
-      min-height: 54px;
-      font-weight: 600;
-    }
-
-    .room-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .room-id {
-      font-size: 24px;
-      font-weight: 750;
-      letter-spacing: 3px;
-    }
-
-    .status {
-      color: #c3c8da;
-      font-size: 13px;
-      line-height: 1.6;
-      padding: 10px 12px;
-      border-radius: 9px;
-      background: #222530;
-      overflow-wrap: anywhere;
-    }
-
-    .messages {
-      min-height: 230px;
-      max-height: 52vh;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 15px 0;
-    }
-
-    .empty {
-      color: var(--muted);
-      text-align: center;
-      margin: auto;
-      padding: 45px 10px;
-      font-size: 14px;
-    }
-
-    .message {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      min-width: 0;
-      background: #1d2028;
-    }
-
-    .message-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 10px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .sender {
-      font-size: 13px;
-      font-weight: 700;
-      overflow-wrap: anywhere;
-    }
-
-    .time { font-size: 11px; color: var(--muted); }
-    .message-body { overflow-wrap: anywhere; white-space: pre-wrap; line-height: 1.55; font-size: 14px; }
-    .ciphertext { color: #b7bdcf; font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
-
-    .composer {
-      display: flex;
-      align-items: flex-end;
-      gap: 9px;
-    }
-
-    .composer textarea { flex: 1; }
-    .composer button { min-height: 46px; }
-
-    details summary { cursor: pointer; color: #dedfe7; font-size: 14px; }
-    details[open] summary { margin-bottom: 17px; }
-    .settings-grid { display: grid; gap: 15px; }
-
-    .error { color: #ffaaaa; }
-    .success { color: #b6e7c5; }
-
-    footer {
-      text-align: center;
-      color: #777983;
-      font-size: 12px;
-      padding: 20px;
-      border-top: 1px solid var(--border);
-    }
-
-    @media (max-width: 520px) {
-      .topbar { padding: 17px 16px; }
-      main { width: min(100% - 22px, 850px); padding: 22px 0; }
-      .panel { padding: 16px; }
-      .home-actions { grid-template-columns: 1fr; }
-      .messages { max-height: 50vh; }
-    }
-  </style>
+</style>
 </head>
-
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <h1>Cipher Chat</h1>
-      <div class="subtitle">Public rooms. Encrypted messages.</div>
-    </div>
-  </header>
-
-  <main>
-    <section id="homePage" class="stack">
-      <div class="panel stack">
-        <div>
-          <h2>Welcome to Cipher Chat</h2>
-          <p class="muted">
-            Create a room or join an existing one. Anyone can view a room's
-            encrypted messages without knowing its secret key.
-          </p>
-        </div>
-
-        <div class="home-actions">
-          <button id="createButton" class="primary">Create room</button>
-          <button id="showJoinButton">Join room</button>
-        </div>
-
-        <div id="joinPanel" class="stack hidden">
-          <hr class="divider">
-          <h3>Join a room</h3>
-          <form id="joinForm" class="stack">
-            <div class="field">
-              <label for="joinRoomId">Room number</label>
-              <input id="joinRoomId" inputmode="numeric" maxlength="4"
-                     pattern="[0-9]{4}" placeholder="4-digit room number" required>
-            </div>
-            <div class="field">
-              <label for="joinKey">Secret key (optional)</label>
-              <input id="joinKey" type="password" autocomplete="off"
-                     placeholder="Leave blank to view ciphertext">
-            </div>
-            <button class="primary" type="submit">Join room</button>
-            <p class="hint">No key? You can still read the encrypted messages.</p>
-          </form>
-        </div>
-      </div>
-
-      <div id="homeStatus" class="status hidden"></div>
-    </section>
-
-    <section id="chatPage" class="stack hidden">
-      <div class="panel stack">
-        <div class="room-heading">
-          <div>
-            <div class="muted">Room number</div>
-            <div id="roomIdDisplay" class="room-id">----</div>
-          </div>
-          <div class="row">
-            <button id="copyRoomButton">Copy room number</button>
-            <button id="leaveButton">Leave room</button>
-          </div>
-        </div>
-
-        <div id="keyStatus" class="status">
-          No key loaded. Messages are displayed as ciphertext.
-        </div>
-
-        <details>
-          <summary>Room settings</summary>
-          <div class="settings-grid">
-            <div class="field">
-              <label for="deviceName">Your device name</label>
-              <input id="deviceName" maxlength="40" placeholder="anonymous">
-              <p class="hint">Saved in this browser. Defaults to anonymous.</p>
-            </div>
-
-            <div class="field">
-              <label for="secretKey">Room secret key</label>
-              <input id="secretKey" type="password" autocomplete="off"
-                     placeholder="Enter the room's secret key">
-            </div>
-
-            <div class="row">
-              <button id="unlockButton" class="primary">Unlock</button>
-              <button id="cipherButton">View ciphertext</button>
-            </div>
-
-            <p id="settingsStatus" class="hint">
-              The key is used in your browser and is not uploaded to Supabase.
-            </p>
-          </div>
-        </details>
-      </div>
-
-      <div class="panel stack">
-        <div class="room-heading">
-          <h2>Messages</h2>
-          <span id="messageCount" class="muted">0 messages</span>
-        </div>
-
-        <div id="messages" class="messages">
-          <div class="empty">Loading messages...</div>
-        </div>
-
-        <form id="sendForm" class="composer">
-          <textarea id="messageInput" rows="1" maxlength="10000"
-                    placeholder="Load the key to send a message..." disabled></textarea>
-          <button id="sendButton" class="primary" type="submit" disabled>Send</button>
-        </form>
-        <p class="hint">Enter to send. Shift + Enter for a new line.</p>
-        <div id="chatStatus" class="hint" role="status"></div>
-      </div>
-    </section>
-  </main>
-
-  <footer>Cipher Chat</footer>
-
-  <script>
-    "use strict";
-
-    // Supabase project configuration
-    const SUPABASE_URL = "https://vwriqbeupkkmsilinalz.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_aVu3Q53R8H4XlJ2NdHCNEQ_n9uFclNH";
-
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
-
-    const $ = id => document.getElementById(id);
-    const NAME_STORAGE_KEY = "cipherchat:deviceName";
-
-    let activeRoom = null;
-    let roomKey = null;
-    let realtimeChannel = null;
-    let messagesById = new Map();
-    let showingCiphertext = true;
-    let loadingMessages = false;
-
-    if (localStorage.getItem(NAME_STORAGE_KEY) === null) {
-      localStorage.setItem(NAME_STORAGE_KEY, "anonymous");
-    }
-
-    $("deviceName").value =
-      localStorage.getItem(NAME_STORAGE_KEY) || "anonymous";
-
-    function getDeviceName() {
-      return (
-        localStorage.getItem(NAME_STORAGE_KEY) || "anonymous"
-      ).trim().slice(0, 40) || "anonymous";
-    }
-
-    $("deviceName").addEventListener("input", () => {
-      const name = $("deviceName").value.trim().slice(0, 40) || "anonymous";
-      localStorage.setItem(NAME_STORAGE_KEY, name);
-    });
-
-    function setStatus(element, message, type = "") {
-      element.textContent = message;
-      element.className = type ? type : "";
-    }
-
-    function showHomeStatus(message, type = "") {
-      $("homeStatus").textContent = message;
-      $("homeStatus").className = "status" + (type ? " " + type : "");
-      $("homeStatus").classList.toggle("hidden", !message);
-    }
-
-    function bytesToHex(bytes) {
-      return Array.from(bytes)
-        .map(byte => byte.toString(16).padStart(2, "0"))
-        .join("");
-    }
-
-    function hexToBytes(hex) {
-      if (!/^(?:[0-9a-fA-F]{2})+$/.test(hex)) {
-        throw new Error("Invalid encrypted data.");
-      }
-
-      const result = new Uint8Array(hex.length / 2);
-      for (let i = 0; i < result.length; i++) {
-        result[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
-      }
-      return result;
-    }
-
-    function randomKey() {
-      return bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
-    }
-
-    async function deriveKey(secret) {
-      const material = new TextEncoder().encode("CipherChat-v1:" + secret);
-      const digest = await crypto.subtle.digest("SHA-256", material);
-
-      return crypto.subtle.importKey(
-        "raw",
-        digest,
-        { name: "AES-GCM" },
-        false,
-        ["encrypt", "decrypt"]
-      );
-    }
-
-    async function encryptMessage(plainText, key) {
-      const iv = crypto.getRandomValues(new Uint8Array(12));
-      const encoded = new TextEncoder().encode(plainText);
-
-      const encrypted = await crypto.subtle.encrypt(
-        { name: "AES-GCM", iv },
-        key,
-        encoded
-      );
-
-      return {
-        cipher: bytesToHex(new Uint8Array(encrypted)),
-        iv: bytesToHex(iv)
-      };
-    }
-
-    async function decryptMessage(cipher, iv, key) {
-      const decrypted = await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv: hexToBytes(iv) },
-        key,
-        hexToBytes(cipher)
-      );
-
-      return new TextDecoder().decode(decrypted);
-    }
-
-    function formatTime(value) {
-      const date = new Date(value);
-      if (Number.isNaN(date.getTime())) return "";
-      return date.toLocaleString();
-    }
-
-    function setKeyStatus(message) {
-      $("keyStatus").textContent = message;
-    }
-
-    function updateComposer() {
-      const unlocked = Boolean(roomKey);
-      $("messageInput").disabled = !unlocked;
-      $("sendButton").disabled = !unlocked;
-      $("messageInput").placeholder = unlocked
-        ? "Write an encrypted message..."
-        : "Load the key to send a message...";
-    }
-
-    function showChat() {
-      $("homePage").classList.add("hidden");
-      $("chatPage").classList.remove("hidden");
-    }
-
-    function showHome() {
-      $("chatPage").classList.add("hidden");
-      $("homePage").classList.remove("hidden");
-    }
-
-    async function createRoom() {
-      $("createButton").disabled = true;
-      showHomeStatus("Creating room...");
-
-      try {
-        let roomId;
-        let created = false;
-
-        for (let attempt = 0; attempt < 30; attempt++) {
-          roomId = String(crypto.getRandomValues(new Uint16Array(1))[0] % 10000)
-            .padStart(4, "0");
-
-          const { error } = await supabaseClient
-            .from("chat_rooms")
-            .insert({ room_id: roomId });
-
-          if (!error) {
-            created = true;
-            break;
-          }
-
-          if (error.code !== "23505") {
-            throw error;
-          }
-        }
-
-        if (!created) {
-          throw new Error("Could not find an unused room number. Try again.");
-        }
-
-        const secret = randomKey();
-        await openRoom(roomId, secret);
-        $("secretKey").value = secret;
-        setStatus(
-          $("settingsStatus"),
-          "This is your room key. Copy and share it privately with people who should decrypt messages.",
-          "success"
-        );
-
-        $("settingsStatus").textContent =
-          "Save this key somewhere safe. It cannot be recovered if lost.";
-
-        $("secretKey").type = "text";
-        setKeyStatus("A key is loaded. Matching messages will be decrypted.");
-        showHomeStatus("");
-      } catch (error) {
-        showHomeStatus(error.message || "Could not create room.", "error");
-      } finally {
-        $("createButton").disabled = false;
-      }
-    }
-
-    async function joinRoom(roomId, secret = "") {
-      if (!/^\d{4}$/.test(roomId)) {
-        throw new Error("Room number must contain exactly four digits.");
-      }
-
-      const { data, error } = await supabaseClient
-        .from("chat_rooms")
-        .select("room_id")
-        .eq("room_id", roomId)
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) throw new Error("That room does not exist.");
-
-      await openRoom(roomId, secret);
-    }
-
-    async function openRoom(roomId, secret = "") {
-      if (realtimeChannel) {
-        await supabaseClient.removeChannel(realtimeChannel);
-        realtimeChannel = null;
-      }
-
-      activeRoom = roomId;
-      roomKey = secret ? await deriveKey(secret) : null;
-      showingCiphertext = !roomKey;
-      messagesById = new Map();
-
-      $("roomIdDisplay").textContent = roomId;
-      $("secretKey").value = secret;
-      $("secretKey").type = "password";
-      $("messages").innerHTML = '<div class="empty">Loading messages...</div>';
-      $("chatStatus").textContent = "";
-      $("settingsStatus").textContent =
-        "The key is used in your browser and is not uploaded to Supabase.";
-
-      updateComposer();
-      setKeyStatus(roomKey
-        ? "A key is loaded. Matching messages will be decrypted."
-        : "No key loaded. Messages are displayed as ciphertext.");
-
-      showChat();
-
-      try {
-        await loadMessages();
-
-        realtimeChannel = supabaseClient
-          .channel("cipher-chat-" + roomId + "-" + crypto.randomUUID())
-          .on(
-            "postgres_changes",
-            {
-              event: "*",
-              schema: "public",
-              table: "chat_messages",
-              filter: "room_id=eq." + roomId
-            },
-            payload => {
-              if (payload.eventType === "DELETE") {
-                messagesById.delete(payload.old.id);
-              } else if (payload.new) {
-                messagesById.set(payload.new.id, payload.new);
-              }
-              renderMessages();
-            }
-          )
-          .subscribe(status => {
-            if (status === "SUBSCRIBED") {
-              $("chatStatus").textContent = "Live updates connected.";
-            } else if (status === "CHANNEL_ERROR") {
-              $("chatStatus").textContent =
-                "Live updates failed. Refresh the page to reconnect.";
-            }
-          });
-      } catch (error) {
-        $("chatStatus").textContent =
-          "Could not load messages: " + (error.message || "Unknown error");
-      }
-    }
-
-    async function loadMessages() {
-      if (!activeRoom) return;
-      loadingMessages = true;
-
-      const { data, error } = await supabaseClient
-        .from("chat_messages")
-        .select("id, room_id, ciphertext, iv, sender_name, created_at")
-        .eq("room_id", activeRoom)
-        .order("created_at", { ascending: true })
-        .limit(500);
-
-      loadingMessages = false;
-      if (error) throw error;
-
-      messagesById = new Map((data || []).map(message => [message.id, message]));
-      renderMessages();
-    }
-
-    async function renderMessages() {
-      const container = $("messages");
-      const shouldScroll =
-        container.scrollHeight - container.scrollTop - container.clientHeight < 100;
-
-      const allMessages = Array.from(messagesById.values()).sort(
-        (a, b) => new Date(a.created_at) - new Date(b.created_at)
-      );
-
-      $("messageCount").textContent =
-        allMessages.length + (allMessages.length === 1 ? " message" : " messages");
-
-      container.replaceChildren();
-
-      if (!allMessages.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "No messages yet. Be the first to send one.";
-        container.appendChild(empty);
-        return;
-      }
-
-      for (const message of allMessages) {
-        const card = document.createElement("article");
-        card.className = "message";
-
-        const top = document.createElement("div");
-        top.className = "message-top";
-
-        const sender = document.createElement("span");
-        sender.className = "sender";
-        sender.textContent = message.sender_name || "anonymous";
-
-        const time = document.createElement("span");
-        time.className = "time";
-        time.textContent = formatTime(message.created_at);
-
-        top.append(sender, time);
-
-        const body = document.createElement("div");
-        body.className = "message-body";
-
-        if (roomKey && !showingCiphertext) {
-          try {
-            body.textContent = await decryptMessage(
-              message.ciphertext,
-              message.iv,
-              roomKey
-            );
-          } catch {
-            body.textContent =
-              "Encrypted message — this key does not match this message.";
-            body.classList.add("ciphertext");
-          }
-        } else {
-          body.textContent =
-            "Ciphertext: " + message.ciphertext + "\nIV: " + message.iv;
-          body.classList.add("ciphertext");
-        }
-
-        card.append(top, body);
-        container.appendChild(card);
-      }
-
-      if (shouldScroll) container.scrollTop = container.scrollHeight;
-    }
-
-    $("createButton").addEventListener("click", createRoom);
-
-    $("showJoinButton").addEventListener("click", () => {
-      $("joinPanel").classList.toggle("hidden");
-      if (!$("joinPanel").classList.contains("hidden")) {
-        $("joinRoomId").focus();
-      }
-    });
-
-    $("joinRoomId").addEventListener("input", event => {
-      event.target.value = event.target.value.replace(/\D/g, "").slice(0, 4);
-    });
-
-    $("joinForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      showHomeStatus("Joining room...");
-
-      try {
-        await joinRoom(
-          $("joinRoomId").value.trim(),
-          $("joinKey").value.trim()
-        );
-        showHomeStatus("");
-      } catch (error) {
-        showHomeStatus(error.message || "Could not join room.", "error");
-      }
-    });
-
-    $("unlockButton").addEventListener("click", async () => {
-      const secret = $("secretKey").value.trim();
-
-      if (!secret) {
-        setStatus($("settingsStatus"), "Enter a secret key first.", "error");
-        return;
-      }
-
-      $("unlockButton").disabled = true;
-      setStatus($("settingsStatus"), "Checking key...");
-
-      try {
-        const candidateKey = await deriveKey(secret);
-        const currentMessages = Array.from(messagesById.values());
-
-        // Verify against existing messages. Empty rooms cannot verify a key.
-        let verified = currentMessages.length === 0;
-
-        for (const message of currentMessages) {
-          try {
-            await decryptMessage(message.ciphertext, message.iv, candidateKey);
-            verified = true;
-            break;
-          } catch {
-            // This message may have been encrypted with another key.
-          }
-        }
-
-        roomKey = candidateKey;
-        showingCiphertext = false;
-        updateComposer();
-        setKeyStatus(verified
-          ? "A key is loaded. Matching messages will be decrypted."
-          : "Key loaded, but none of the existing messages matched it.");
-
-        setStatus(
-          $("settingsStatus"),
-          verified
-            ? "Key loaded in this browser."
-            : "No existing message verified this key. Messages using other keys will remain encrypted.",
-          verified ? "success" : "error"
-        );
-
-        await renderMessages();
-      } catch (error) {
-        setStatus(
-          $("settingsStatus"),
-          error.message || "Could not load key.",
-          "error"
-        );
-      } finally {
-        $("unlockButton").disabled = false;
-      }
-    });
-
-    $("cipherButton").addEventListener("click", async () => {
-      showingCiphertext = true;
-      setKeyStatus("Viewing ciphertext. Your key remains loaded.");
-      await renderMessages();
-    });
-
-    $("sendForm").addEventListener("submit", async event => {
-      event.preventDefault();
-
-      const text = $("messageInput").value;
-      if (!activeRoom || !roomKey || !text.trim()) return;
-
-      $("sendButton").disabled = true;
-      $("chatStatus").textContent = "Encrypting and sending...";
-
-      try {
-        const encrypted = await encryptMessage(text, roomKey);
-
-        const { error } = await supabaseClient
-          .from("chat_messages")
-          .insert({
-            room_id: activeRoom,
-            ciphertext: encrypted.cipher,
-            iv: encrypted.iv,
-            sender_name: getDeviceName()
-          });
-
-        if (error) throw error;
-
-        $("messageInput").value = "";
-        $("messageInput").style.height = "auto";
-        $("chatStatus").textContent = "Message sent.";
-      } catch (error) {
-        $("chatStatus").textContent =
-          "Could not send message: " + (error.message || "Unknown error");
-      } finally {
-        updateComposer();
-        $("messageInput").focus();
-      }
-    });
-
-    $("messageInput").addEventListener("keydown", event => {
-      if (
-        event.key === "Enter" &&
-        !event.shiftKey &&
-        !event.isComposing
-      ) {
-        event.preventDefault();
-        if (!$("sendButton").disabled) {
-          $("sendForm").requestSubmit();
-        }
-      }
-    });
-
-    $("messageInput").addEventListener("input", event => {
-      const input = event.target;
-      input.style.height = "auto";
-      input.style.height = Math.min(input.scrollHeight, 150) + "px";
-    });
-
-    $("copyRoomButton").addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(activeRoom);
-        $("chatStatus").textContent = "Room number copied.";
-      } catch {
-        $("chatStatus").textContent =
-          "Could not copy automatically. Room number: " + activeRoom;
-      }
-    });
-
-    $("leaveButton").addEventListener("click", async () => {
-      if (realtimeChannel) {
-        await supabaseClient.removeChannel(realtimeChannel);
-        realtimeChannel = null;
-      }
-
-      activeRoom = null;
-      roomKey = null;
-      messagesById.clear();
-      $("secretKey").value = "";
-      $("joinKey").value = "";
-      $("messageInput").value = "";
-      updateComposer();
-      showHome();
-    });
-  </script>
+<header class="topbar"><div class="topbar-inner"><h1>Cipher Chat</h1><div class="subtitle">Public rooms. Encrypted messages.</div></div></header>
+<main>
+<section id="homePage" class="stack">
+ <div class="panel stack"><div><h2>Welcome to Cipher Chat</h2><p class="muted">Create a room or join an existing one. Anyone can view encrypted messages without knowing the secret key.</p></div>
+ <div class="home-actions"><button id="createButton" class="primary">Create room</button><button id="showJoinButton">Join room</button></div>
+ <div id="joinPanel" class="stack hidden"><hr class="divider"><h3>Join a room</h3><form id="joinForm" class="stack"><div class="field"><label for="joinRoomId">Room number</label><input id="joinRoomId" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" placeholder="4-digit room number" required></div><div class="field"><label for="joinKey">Secret key (optional)</label><input id="joinKey" type="password" autocomplete="off" placeholder="Leave blank to view ciphertext"></div><button class="primary" type="submit">Join room</button><p class="hint">No key? You can still read encrypted messages.</p></form></div></div>
+ <div id="homeStatus" class="status hidden"></div>
+</section>
+<section id="chatPage" class="stack hidden">
+ <div class="panel stack"><div class="room-heading"><div><div class="muted">Room number</div><div id="roomIdDisplay" class="room-id">----</div></div><div class="row"><button id="copyRoomButton">Copy room number</button><button id="leaveButton">Leave room</button></div></div>
+ <div id="keyStatus" class="status">No key loaded. Messages are displayed as ciphertext.</div>
+ <details><summary>Room settings</summary><div class="settings-grid"><div class="field"><label for="deviceName">Your device name</label><input id="deviceName" maxlength="40" placeholder="anonymous"><p class="hint">Saved in this browser. Defaults to anonymous.</p></div><div class="field"><label for="secretKey">Room secret key</label><input id="secretKey" type="password" autocomplete="off" placeholder="Enter the room's secret key"></div><div class="row"><button id="unlockButton" class="primary">Unlock</button><button id="cipherButton">View ciphertext</button></div><label class="row inline-row"><input id="forgetKeyOnLeave" type="checkbox" checked class="inline-checkbox"> Forget key when leaving room</label><p class="hint">If unchecked, the key is kept only in this browser tab’s memory—not online.</p><p id="settingsStatus" class="hint">The key is used in your browser and is not uploaded to Supabase.</p></div></details></div>
+ <div class="panel stack"><div class="room-heading"><h2>Messages</h2><span id="messageCount" class="muted">0 messages</span></div><div id="messages" class="messages"><div class="empty">Loading messages...</div></div>
+ <div id="pendingFile" class="file-chip hidden"><div class="file-preview-top"><button type="button" id="spoilerFileButton" class="file-tool" title="Mark as spoiler" aria-label="Mark as spoiler">◉</button><button type="button" id="editFileButton" class="file-tool" title="Edit name and description" aria-label="Edit attachment">✎</button><button type="button" id="removeFileButton" class="file-tool delete-file" title="Remove attachment" aria-label="Remove attachment">🗑</button></div><div class="file-preview-content"><img id="pendingFileImage" class="file-preview-thumb hidden" alt="Attachment preview"><div id="pendingFileIcon" class="file-preview-thumb file-preview-placeholder">▤</div><div class="file-preview-meta"><span class="file-name" id="pendingFileName"></span><div id="pendingFileSize" class="muted"></div><div id="pendingFileDescription" class="file-description-preview"></div></div></div><div id="pendingFileSpoiler" class="file-spoiler-overlay hidden">SPOILER</div></div>
+<div id="fileEditDialog" class="file-edit-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="fileEditTitle"><div class="file-edit-card"><h3 id="fileEditTitle">Edit attachment</h3><div class="field"><label for="fileEditName">File name</label><input id="fileEditName" maxlength="180" placeholder="File name"></div><div class="field"><label for="fileEditDescription">Description</label><textarea id="fileEditDescription" maxlength="500" placeholder="Add a description (optional)"></textarea></div><div class="file-edit-actions"><button type="button" id="cancelFileEdit">Cancel</button><button type="button" id="saveFileEdit" class="primary">Save</button></div></div></div>
+ <form id="sendForm"><div class="composer-shell"><button type="button" id="attachButton" class="attach-button" aria-label="Attach a file" title="Attach a file">+</button><textarea id="messageInput" rows="1" maxlength="10000" placeholder="Message #Room0000" disabled></textarea><div id="recordingWaveform" class="waveform hidden" aria-label="Recording waveform"></div><button type="button" id="emojiButton" class="emoji-button" aria-label="Choose emoji" title="Choose emoji" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><path d="M9 9h.01M15 9h.01"></path></svg></button><button type="button" id="audioButton" class="audio-button" aria-label="Record audio" title="Record audio" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M9 21.5h6"></path></svg></button><button type="button" id="sendRecordingButton" class="recording-action recording-send hidden" aria-label="Send voice message" title="Send voice message">➤</button><button type="button" id="deleteRecordingButton" class="recording-action recording-delete hidden" aria-label="Delete voice recording" title="Delete voice recording">×</button><div id="emojiPicker" class="emoji-picker hidden" aria-label="Emoji picker"><emoji-picker></emoji-picker></div></div><input id="fileInput" class="file-input" type="file"><div class="hint composer-hint">Enter to send. Shift + Enter for a new line. Attachments are encrypted before upload (maximum 10 MB).</div><div id="chatStatus" class="hint" role="status"></div></form>
+ </div>
+</section>
+</main><footer>Cipher Chat</footer>
+<script defer>
+"use strict";
+const SUPABASE_URL="https://vwriqbeupkkmsilinalz.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_aVu3Q53R8H4XlJ2NdHCNEQ_n9uFclNH";
+const FILE_BUCKET="cipher-chat-files";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const $=id=>document.getElementById(id),NAME_STORAGE_KEY="cipherchat:deviceName",MAX_FILE_SIZE=10*1024*1024;
+let activeRoom=null,roomKey=null,rememberedSecret="",realtimeChannel=null,messagesById=new Map(),showingCiphertext=true,pendingFile=null,pendingFileName="",pendingFileDescription="",pendingFileSpoiler=false,pendingPreviewUrl="",mediaRecorder=null,recordedChunks=[],audioStream=null,audioContext=null,analyser=null,animationFrame=0,recordingStarted=false,recordedDraft=null;
+if(localStorage.getItem(NAME_STORAGE_KEY)===null)localStorage.setItem(NAME_STORAGE_KEY,"anonymous");
+$("deviceName").value=localStorage.getItem(NAME_STORAGE_KEY)||"anonymous";
+function getDeviceName(){return(localStorage.getItem(NAME_STORAGE_KEY)||"anonymous").trim().slice(0,40)||"anonymous"}
+$("deviceName").addEventListener("input",()=>localStorage.setItem(NAME_STORAGE_KEY,$("deviceName").value.trim().slice(0,40)||"anonymous"));
+function setStatus(el,msg,type=""){el.textContent=msg;el.className=type||"hint"}
+function showHomeStatus(msg,type=""){ $("homeStatus").textContent=msg;$("homeStatus").className="status"+(type?" "+type:"");$("homeStatus").classList.toggle("hidden",!msg)}
+function bytesToHex(bytes){return Array.from(bytes).map(b=>b.toString(16).padStart(2,"0")).join("")}
+function hexToBytes(hex){if(!/^(?:[0-9a-fA-F]{2})+$/.test(hex))throw new Error("Invalid encrypted data.");const out=new Uint8Array(hex.length/2);for(let i=0;i<out.length;i++)out[i]=parseInt(hex.slice(i*2,i*2+2),16);return out}
+function randomKey(){return bytesToHex(crypto.getRandomValues(new Uint8Array(32)))}
+async function deriveKey(secret){const material=new TextEncoder().encode("CipherChat-v1:"+secret),digest=await crypto.subtle.digest("SHA-256",material);return crypto.subtle.importKey("raw",digest,{name:"AES-GCM"},false,["encrypt","decrypt"])}
+async function encryptBytes(bytes,key){const iv=crypto.getRandomValues(new Uint8Array(12));const encrypted=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,bytes);return{cipher:new Uint8Array(encrypted),iv:bytesToHex(iv)}}
+async function decryptBytes(bytes,iv,key){return new Uint8Array(await crypto.subtle.decrypt({name:"AES-GCM",iv:hexToBytes(iv)},key,bytes))}
+async function encryptMessage(text,key){const e=await encryptBytes(new TextEncoder().encode(text),key);return{cipher:bytesToHex(e.cipher),iv:e.iv}}
+async function decryptMessage(cipher,iv,key){const bytes=await decryptBytes(hexToBytes(cipher),iv,key);return new TextDecoder().decode(bytes)}
+function formatTime(value){const d=new Date(value);return Number.isNaN(d.getTime())?"":d.toLocaleTimeString([], {hour:"numeric",minute:"2-digit"})}
+function formatDay(value){const d=new Date(value);return Number.isNaN(d.getTime())?"Unknown date":d.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
+function initials(name){return (name||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"?"}
+function setKeyStatus(message){$("keyStatus").textContent=message}
+function updateComposer(){const unlocked=Boolean(roomKey);$("messageInput").disabled=!unlocked;$("attachButton").disabled=!unlocked;$("emojiButton").disabled=!unlocked;$("audioButton").disabled=!unlocked;$("messageInput").placeholder=makePlaceholder();}
+function makePlaceholder(){if(!activeRoom)return"Message...";const names=new Set([getDeviceName()]);for(const m of messagesById.values())names.add((m.sender_name||"anonymous").trim()||"anonymous");if(names.size===2){const other=[...names].find(n=>n!==getDeviceName());if(other)return"Message @"+other}return"Message #Room"+activeRoom}
+function updatePlaceholder(){$("messageInput").placeholder=makePlaceholder()}
+function showChat(){$("homePage").classList.add("hidden");$("chatPage").classList.remove("hidden")}
+function showHome(){$("chatPage").classList.add("hidden");$("homePage").classList.remove("hidden")}
+async function createRoom(){ $("createButton").disabled=true;showHomeStatus("Creating room...");try{let id,created=false;for(let i=0;i<30;i++){id=String(crypto.getRandomValues(new Uint16Array(1))[0]%10000).padStart(4,"0");const{error}=await supabaseClient.from("chat_rooms").insert({room_id:id});if(!error){created=true;break}if(error.code!=="23505")throw error}if(!created)throw new Error("Could not find an unused room number. Try again.");const secret=randomKey();await openRoom(id,secret);$("secretKey").value=secret;$("secretKey").type="text";setStatus($("settingsStatus"),"Save this key somewhere safe. It cannot be recovered if lost.","success");setKeyStatus("A key is loaded. Matching messages will be decrypted.");showHomeStatus("")}catch(e){showHomeStatus(e.message||"Could not create room.","error")}finally{$("createButton").disabled=false}}
+async function joinRoom(id,secret=""){if(!secret&&!$("forgetKeyOnLeave").checked)secret=rememberedSecret;if(!/^\d{4}$/.test(id))throw new Error("Room number must contain exactly four digits.");const{data,error}=await supabaseClient.from("chat_rooms").select("room_id").eq("room_id",id).maybeSingle();if(error)throw error;if(!data)throw new Error("That room does not exist.");await openRoom(id,secret)}
+async function openRoom(id,secret=""){if(secret)rememberedSecret=secret;if(realtimeChannel){await supabaseClient.removeChannel(realtimeChannel);realtimeChannel=null}activeRoom=id;roomKey=secret?await deriveKey(secret):null;showingCiphertext=!roomKey;messagesById=new Map();pendingFile=null;renderPendingFile();$("roomIdDisplay").textContent=id;$("secretKey").value=secret;$("secretKey").type="password";$("messages").innerHTML='<div class="empty">Loading messages...</div>';$ ("chatStatus").textContent="";$("settingsStatus").textContent="The key is used in your browser and is not uploaded to Supabase.";updateComposer();setKeyStatus(roomKey?"A key is loaded. Matching messages will be decrypted.":"No key loaded. Messages are displayed as ciphertext.");showChat();try{await loadMessages();realtimeChannel=supabaseClient.channel("cipher-chat-"+id+"-"+crypto.randomUUID()).on("postgres_changes",{event:"*",schema:"public",table:"chat_messages",filter:"room_id=eq."+id},payload=>{if(payload.eventType==="DELETE")messagesById.delete(payload.old.id);else if(payload.new)messagesById.set(payload.new.id,payload.new);renderMessages()}).subscribe(status=>{if(status==="SUBSCRIBED")$("chatStatus").textContent="Live updates connected.";else if(status==="CHANNEL_ERROR")$("chatStatus").textContent="Live updates failed. Refresh to reconnect."})}catch(e){$("chatStatus").textContent="Could not load messages: "+(e.message||"Unknown error")}}
+async function loadMessages(){const{data,error}=await supabaseClient.from("chat_messages").select("id,room_id,ciphertext,iv,sender_name,created_at").eq("room_id",activeRoom).order("created_at",{ascending:true}).limit(500);if(error)throw error;messagesById=new Map((data||[]).map(m=>[m.id,m]));await renderMessages()}
+function appendText(parent,text,className){const el=document.createElement("div");el.className=className||"message-body";el.textContent=text;parent.appendChild(el);return el}
+function renderPendingFile(){const box=$("pendingFile");box.classList.toggle("hidden",!pendingFile);if(!pendingFile){if(pendingPreviewUrl){URL.revokeObjectURL(pendingPreviewUrl);pendingPreviewUrl=""}return}$("pendingFileName").textContent=pendingFileName||pendingFile.name;$("pendingFileSize").textContent=formatSize(pendingFile.size);$("pendingFileDescription").textContent=pendingFileDescription;$("pendingFileDescription").classList.toggle("hidden",!pendingFileDescription);$("pendingFileSpoiler").classList.toggle("hidden",!pendingFileSpoiler);$("spoilerFileButton").classList.toggle("spoiler-on",pendingFileSpoiler);$("spoilerFileButton").title=pendingFileSpoiler?"Remove spoiler marking":"Mark as spoiler";const isImage=pendingFile.type.startsWith("image/");$("pendingFileImage").classList.toggle("hidden",!isImage);$("pendingFileIcon").classList.toggle("hidden",isImage);if(isImage){if(pendingPreviewUrl)URL.revokeObjectURL(pendingPreviewUrl);pendingPreviewUrl=URL.createObjectURL(pendingFile);$("pendingFileImage").src=pendingPreviewUrl;$("pendingFileImage").alt=pendingFileName||pendingFile.name}else{$("pendingFileIcon").textContent=pendingFile.type.startsWith("video/")?"▶":pendingFile.type.startsWith("audio/")?"🔊":/pdf/i.test(pendingFile.type)?"PDF":"▤"}}
+function formatSize(size){if(size<1024)return size+" B";if(size<1024*1024)return(size/1024).toFixed(1)+" KB";return(size/1024/1024).toFixed(1)+" MB"}
+async function renderMessages(){const container=$("messages"),scroll=container.scrollHeight-container.scrollTop-container.clientHeight<100,all=[...messagesById.values()].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));$("messageCount").textContent=all.length+(all.length===1?" message":" messages");updatePlaceholder();container.replaceChildren();if(!all.length){appendText(container,"No messages yet. Be the first to send one.","empty");return}let previousDay="";for(const m of all){const day=formatDay(m.created_at);if(day!==previousDay){const divider=document.createElement("div");divider.className="day-divider";divider.textContent=day;container.appendChild(divider);previousDay=day}const card=document.createElement("article");const senderName=(m.sender_name||"anonymous").trim()||"anonymous";const own=senderName.toLocaleLowerCase()===getDeviceName().toLocaleLowerCase();card.className="message"+(own?" own-message":"");const avatar=document.createElement("div");avatar.className="avatar";if(senderName.includes(" "))avatar.textContent=initials(senderName);else{avatar.classList.add("silhouette");avatar.textContent="👤";}avatar.setAttribute("aria-label",(m.sender_name||"anonymous")+" profile picture");const content=document.createElement("div");content.className="message-content";const top=document.createElement("div");top.className="message-top";const sender=document.createElement("span");sender.className="sender";sender.textContent=senderName;const time=document.createElement("span");time.className="time";time.textContent=formatTime(m.created_at);top.append(sender,time);content.appendChild(top);if(roomKey&&!showingCiphertext){try{const raw=await decryptMessage(m.ciphertext,m.iv,roomKey);let payload;try{payload=JSON.parse(raw)}catch{payload={kind:"text",text:raw}}if(payload&&(payload.kind==="file"||payload.kind==="audio")){const link=document.createElement("a");link.href="#";link.className="attachment";const ico=document.createElement("span");ico.className="attachment-icon";ico.textContent=payload.kind==="audio"?"🔊":"▤";const label=document.createElement("span");label.className="attachment-name";if(payload.kind==="audio"){label.className="attachment-name voice-title";label.innerHTML="<span class=\"voice-label\">Voice message</span><span class=\"voice-hover-wave\" aria-hidden=\"true\"><span class=\"voice-wave\"><i></i><i></i><i></i></span></span>"}else {label.textContent=(payload.name||"Attachment")+(payload.description?" — "+payload.description:"");if(payload.spoiler){link.classList.add("spoiler-attachment");link.style.filter="blur(5px)";link.title="Spoiler attachment — click to reveal/download";link.addEventListener("click",()=>{link.style.filter="none";link.title=payload.description||payload.name||"Attachment"},{once:true})}}link.append(ico,label);let voiceOpened=false;const openThisAttachment=async(e,autoPlay=false)=>{e.preventDefault();if(payload.kind==="audio"&&voiceOpened)return; if(payload.kind==="audio")voiceOpened=true;link.style.opacity=".6";try{const{data,error}=await supabaseClient.storage.from(FILE_BUCKET).download(payload.path);if(error)throw error;const encrypted=new Uint8Array(await data.arrayBuffer());const bytes=await decryptBytes(encrypted,payload.fileIv,roomKey);const blob=new Blob([bytes],{type:payload.type||"application/octet-stream"});const url=URL.createObjectURL(blob);if(payload.kind==="audio"){const player=document.createElement("audio");player.controls=true;player.preload="metadata";player.className="audio-player";player.src=url;link.replaceWith(player);if(autoPlay){player.autoplay=true;player.play().catch(()=>{});}player.addEventListener("ended",()=>{URL.revokeObjectURL(url)},{once:true});player.addEventListener("error",()=>{$("chatStatus").textContent="This browser could not play the voice message."},{once:true})}else{const a=document.createElement("a");a.href=url;a.download=payload.name||"download";a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);$("chatStatus").textContent="Attachment downloaded."}}catch(err){$("chatStatus").textContent="Could not open attachment: "+(err.message||"Unknown error")}finally{link.style.opacity="1"}};link.addEventListener("click",e=>openThisAttachment(e,false));if(payload.kind==="audio")link.addEventListener("mouseenter",e=>openThisAttachment(e,true),{once:true});content.appendChild(link)}else appendText(content,payload.text??raw,"message-body")}catch{appendText(content,"Encrypted message — this key does not match this message.","message-body ciphertext")}}else appendText(content,"Ciphertext: "+m.ciphertext+"\nIV: "+m.iv,"message-body ciphertext");card.append(avatar,content);container.appendChild(card)}if(scroll)container.scrollTop=container.scrollHeight}
+$("createButton").addEventListener("click",createRoom);$("showJoinButton").addEventListener("click",()=>{$("joinPanel").classList.toggle("hidden");if(!$ ("joinPanel").classList.contains("hidden"))$("joinRoomId").focus()});$("joinRoomId").addEventListener("input",e=>e.target.value=e.target.value.replace(/\D/g,"").slice(0,4));$("joinForm").addEventListener("submit",async e=>{e.preventDefault();showHomeStatus("Joining room...");try{await joinRoom($("joinRoomId").value.trim(),$("joinKey").value.trim());showHomeStatus("")}catch(err){showHomeStatus(err.message||"Could not join room.","error")}});
+$("unlockButton").addEventListener("click",async()=>{const secret=$("secretKey").value.trim();if(!secret){setStatus($("settingsStatus"),"Enter a secret key first.","error");return}$("unlockButton").disabled=true;setStatus($("settingsStatus"),"Checking key...");try{const candidate=await deriveKey(secret),all=[...messagesById.values()];let verified=all.length===0;for(const m of all){try{await decryptMessage(m.ciphertext,m.iv,candidate);verified=true;break}catch{}}roomKey=candidate;showingCiphertext=false;updateComposer();setKeyStatus(verified?"A key is loaded. Matching messages will be decrypted.":"Key loaded, but none of the existing messages matched it.");setStatus($("settingsStatus"),verified?"Key loaded in this browser.":"No existing message verified this key. Messages using other keys will remain encrypted.",verified?"success":"error");await renderMessages()}catch(err){setStatus($("settingsStatus"),err.message||"Could not load key.","error")}finally{$("unlockButton").disabled=false}});
+$("cipherButton").addEventListener("click",async()=>{showingCiphertext=true;setKeyStatus("Viewing ciphertext. Your key remains loaded.");await renderMessages()});
+async function sendPayload(payload){const encrypted=await encryptMessage(JSON.stringify(payload),roomKey);const{error}=await supabaseClient.from("chat_messages").insert({room_id:activeRoom,ciphertext:encrypted.cipher,iv:encrypted.iv,sender_name:getDeviceName()});if(error)throw error}
+async function uploadEncryptedBlob(blob,kind,name,metadata={}){if(blob.size>MAX_FILE_SIZE)throw new Error("Audio or files must be 10 MB or smaller.");const raw=new Uint8Array(await blob.arrayBuffer()),encrypted=await encryptBytes(raw,roomKey),path=activeRoom+"/"+crypto.randomUUID()+".bin";const{error:uploadError}=await supabaseClient.storage.from(FILE_BUCKET).upload(path,encrypted.cipher,{contentType:"application/octet-stream",upsert:false});if(uploadError)throw uploadError;await sendPayload({kind,path,name:name||"voice-message.webm",description:metadata.description||"",spoiler:Boolean(metadata.spoiler),type:blob.type||"application/octet-stream",size:blob.size,fileIv:encrypted.iv})}
+async function sendCurrent(){const text=$("messageInput").value;const file=pendingFile;if(!roomKey||(!text.trim()&&!file))return;$("chatStatus").textContent=file?"Encrypting and uploading attachment...":"Encrypting and sending...";try{if(file){if(file.size>MAX_FILE_SIZE)throw new Error("Files must be 10 MB or smaller.");await uploadEncryptedBlob(file,"file",pendingFileName||file.name,{description:pendingFileDescription,spoiler:pendingFileSpoiler})}if(text.trim())await sendPayload({kind:"text",text});$("messageInput").value="";$("messageInput").style.height="auto";pendingFile=null;pendingFileName="";pendingFileDescription="";pendingFileSpoiler=false;renderPendingFile();$("chatStatus").textContent="Message sent."}catch(err){$("chatStatus").textContent="Could not send: "+(err.message||"Unknown error")}finally{updateComposer();$("messageInput").focus()}}
+$("sendForm").addEventListener("submit",e=>{e.preventDefault();sendCurrent()});$("messageInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();sendCurrent()}});$("messageInput").addEventListener("input",e=>{e.target.style.height="auto";e.target.style.height=Math.min(e.target.scrollHeight,150)+"px"});
+$("attachButton").addEventListener("click",()=>$("fileInput").click());$("fileInput").addEventListener("change",e=>{const file=e.target.files?.[0];if(!file)return;if(file.size>MAX_FILE_SIZE){$("chatStatus").textContent="Files must be 10 MB or smaller.";e.target.value="";return}pendingFile=file;pendingFileName=file.name;pendingFileDescription="";pendingFileSpoiler=false;renderPendingFile();$("chatStatus").textContent="Attachment ready. Send a message to upload it encrypted.";e.target.value=""});$("removeFileButton").addEventListener("click",()=>{pendingFile=null;pendingFileName="";pendingFileDescription="";pendingFileSpoiler=false;renderPendingFile()});
+$("spoilerFileButton").addEventListener("click",()=>{pendingFileSpoiler=!pendingFileSpoiler;renderPendingFile()});
+$("editFileButton").addEventListener("click",()=>{if(!pendingFile)return;$("fileEditName").value=pendingFileName||pendingFile.name;$("fileEditDescription").value=pendingFileDescription;$("fileEditDialog").classList.remove("hidden");$("fileEditName").focus()});
+function closeFileEdit(){$("fileEditDialog").classList.add("hidden")}
+$("cancelFileEdit").addEventListener("click",closeFileEdit);
+$("fileEditDialog").addEventListener("click",e=>{if(e.target===$("fileEditDialog"))closeFileEdit()});
+$("saveFileEdit").addEventListener("click",()=>{pendingFileName=$("fileEditName").value.trim().slice(0,180)||pendingFile.name;pendingFileDescription=$("fileEditDescription").value.trim().slice(0,500);renderPendingFile();closeFileEdit()});
+const MIC_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="2.5" width="6" height="12" rx="3"></rect><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3.5M9 21.5h6"></path></svg>';
+const STOP_ICON='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="6.5" width="11" height="11" rx="2"></rect></svg>';
+function setAudioButtonIcon(recording=false){const button=$("audioButton");button.innerHTML=recording?STOP_ICON:MIC_ICON;button.setAttribute("aria-label",recording?"Stop recording":"Record audio");}
+function stopWaveAnimation(){if(animationFrame)cancelAnimationFrame(animationFrame);animationFrame=0}
+function animateWaveform(){const wrap=$("recordingWaveform");if(!analyser||wrap.classList.contains("hidden"))return;const bars=wrap.querySelectorAll(".waveform-bar");const data=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(data);let sum=0;for(const v of data){const x=(v-128)/128;sum+=x*x}const rms=Math.sqrt(sum/data.length);bars.forEach((bar,i)=>{const sample=data[Math.floor((i+1)*data.length/4)]||128;const amplitude=Math.abs(sample-128)/128;const scale=Math.max(.45,Math.min(1.8,.45+amplitude*1.8+rms*2));bar.style.transform="scaleY("+scale+")"});animationFrame=requestAnimationFrame(animateWaveform)}
+function showWaveform(){const wrap=$("recordingWaveform");wrap.replaceChildren();for(let i=0;i<3;i++){const bar=document.createElement("span");bar.className="waveform-bar recording-wave-bar recording-wave-bar-"+(i+1);wrap.appendChild(bar)}wrap.classList.remove("hidden");$("messageInput").classList.add("hidden");$("audioButton").classList.add("recording");setAudioButtonIcon(true);$("audioButton").title="Stop recording";$("sendRecordingButton").classList.add("hidden");$("deleteRecordingButton").classList.add("hidden");animateWaveform()}
+function showRecordedDraft(blob){recordedDraft=blob;stopWaveAnimation();const wrap=$("recordingWaveform");wrap.replaceChildren();for(let i=0;i<3;i++){const bar=document.createElement("span");bar.className="waveform-bar recording-wave-bar recording-wave-bar-"+(i+1);wrap.appendChild(bar)}wrap.classList.remove("hidden");$("messageInput").classList.add("hidden");$("audioButton").classList.remove("recording");setAudioButtonIcon(false);$("audioButton").title="Record again";$("sendRecordingButton").classList.remove("hidden");$("deleteRecordingButton").classList.remove("hidden");audioContext?.close().catch(()=>{});audioContext=null;analyser=null;if(audioStream){audioStream.getTracks().forEach(t=>t.stop());audioStream=null}}
+function hideWaveform(){stopWaveAnimation();$("recordingWaveform").classList.add("hidden");$("messageInput").classList.remove("hidden");$("audioButton").classList.remove("recording");setAudioButtonIcon(false);$("audioButton").title="Record audio";$("sendRecordingButton").classList.add("hidden");$("deleteRecordingButton").classList.add("hidden");audioContext?.close().catch(()=>{});audioContext=null;analyser=null;if(audioStream){audioStream.getTracks().forEach(t=>t.stop());audioStream=null}}
+async function toggleRecording(){if(recordedDraft){recordedDraft=null;hideWaveform();return}if(mediaRecorder&&mediaRecorder.state!=="inactive"){mediaRecorder.stop();return}if(!roomKey)return;if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){$("chatStatus").textContent="Audio recording is not supported by this browser.";return}try{audioStream=await navigator.mediaDevices.getUserMedia({audio:true});recordedChunks=[];audioContext=new(window.AudioContext||window.webkitAudioContext)();const source=audioContext.createMediaStreamSource(audioStream);analyser=audioContext.createAnalyser();analyser.fftSize=256;source.connect(analyser);const options={};if(MediaRecorder.isTypeSupported("audio/webm;codecs=opus"))options.mimeType="audio/webm;codecs=opus";else if(MediaRecorder.isTypeSupported("audio/mp4"))options.mimeType="audio/mp4";mediaRecorder=new MediaRecorder(audioStream,options);recordingStarted=true;mediaRecorder.addEventListener("dataavailable",e=>{if(e.data&&e.data.size)recordedChunks.push(e.data)});mediaRecorder.addEventListener("stop",()=>{const type=mediaRecorder?.mimeType||recordedChunks[0]?.type||"audio/webm";const blob=new Blob(recordedChunks,{type});recordingStarted=false;if(!blob.size){hideWaveform();$("chatStatus").textContent="No audio was recorded.";return}showRecordedDraft(blob);$("chatStatus").textContent="Voice message ready. Press send or delete."});mediaRecorder.start(150);showWaveform();$("chatStatus").textContent="Recording… press the stop button when finished."}catch(err){hideWaveform();$("chatStatus").textContent=err.name==="NotAllowedError"?"Microphone permission was denied.":"Could not start recording: "+(err.message||"Unknown error")}}
+async function sendRecordedDraft(){if(!recordedDraft||!roomKey)return;const blob=recordedDraft;$("sendRecordingButton").disabled=true;$("deleteRecordingButton").disabled=true;try{$("chatStatus").textContent="Encrypting and sending voice message…";await uploadEncryptedBlob(blob,"audio",blob.type.includes("mp4")?"voice-message.m4a":"voice-message.webm");recordedDraft=null;hideWaveform();$("chatStatus").textContent="Voice message sent."}catch(err){$("chatStatus").textContent="Could not send voice message: "+(err.message||"Unknown error")}finally{$("sendRecordingButton").disabled=false;$("deleteRecordingButton").disabled=false}}
+function deleteRecordedDraft(){recordedDraft=null;recordedChunks=[];hideWaveform();$("chatStatus").textContent="Voice recording deleted."}
+$("audioButton").addEventListener("click",toggleRecording);$("sendRecordingButton").addEventListener("click",sendRecordedDraft);$("deleteRecordingButton").addEventListener("click",deleteRecordedDraft);
+const emojiPicker=$("emojiPicker").querySelector("emoji-picker");
+function setEmojiPickerOpen(open){$("emojiPicker").classList.toggle("hidden",!open);$("emojiButton").classList.toggle("picker-open",open);$("emojiButton").setAttribute("aria-expanded",String(open));if(open){emojiPicker?.focus?.();}}
+$("emojiButton").addEventListener("click",()=>setEmojiPickerOpen($("emojiPicker").classList.contains("hidden")));
+emojiPicker?.addEventListener("emoji-click",event=>{const emoji=event.detail?.unicode;if(!emoji)return;const input=$("messageInput"),start=input.selectionStart,end=input.selectionEnd;input.setRangeText(emoji,start,end,"end");input.focus();input.dispatchEvent(new Event("input"));});
+// Hide the picker and reset its colorful active state when it closes or the room is left.
+document.addEventListener("click",e=>{if(!$("emojiPicker").contains(e.target)&&e.target!==$("emojiButton"))setEmojiPickerOpen(false)});
+window.addEventListener("pagehide",()=>setEmojiPickerOpen(false));
+$("copyRoomButton").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(activeRoom);$("chatStatus").textContent="Room number copied."}catch{$("chatStatus").textContent="Room number: "+activeRoom}});$("leaveButton").addEventListener("click",async()=>{setEmojiPickerOpen(false);recordedDraft=null;if(mediaRecorder&&mediaRecorder.state!=="inactive")mediaRecorder.stop();hideWaveform();if(realtimeChannel){await supabaseClient.removeChannel(realtimeChannel);realtimeChannel=null}activeRoom=null;if($("forgetKeyOnLeave").checked){roomKey=null;rememberedSecret="";$("secretKey").value="";}else if($("secretKey").value.trim()){rememberedSecret=$("secretKey").value.trim();}messagesById.clear();pendingFile=null;$("secretKey").value="";$("joinKey").value="";$("messageInput").value="";renderPendingFile();updateComposer();showHome()});
+
+</script>
 </body>
 </html>
