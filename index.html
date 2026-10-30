@@ -37,10 +37,13 @@ main{width:min(100% - 32px,850px);margin:0 auto;padding:36px 0;flex:1}.panel{bac
 
 
 .profile-editor{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:12px;background:#222329;border:1px solid var(--border);border-radius:12px}.profile-preview{width:64px;height:64px;flex:0 0 64px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(145deg,#515a70,#252a37);border:1px solid #62697a;color:#f4f4fa;font-weight:750;font-size:20px}.profile-preview img,.avatar img{width:100%;height:100%;object-fit:cover;display:block}.profile-preview.silhouette{position:relative;background:#30323b;color:transparent;font-size:0}.profile-preview.silhouette:before{content:"";position:absolute;width:27%;height:27%;border-radius:50%;background:#bfc2cc;top:19%;left:36.5%}.profile-preview.silhouette:after{content:"";position:absolute;width:58%;height:34%;border-radius:50% 50% 35% 35%;background:#bfc2cc;left:21%;bottom:12%}.profile-editor-info{flex:1;min-width:160px}.profile-editor-info strong{display:block;font-size:14px;margin-bottom:4px}.profile-actions{display:flex;gap:8px;flex-wrap:wrap}.profile-upload-input{display:none}.avatar.has-picture{background:#222329;color:transparent}
+.profile-settings-button{position:fixed;left:18px;bottom:18px;z-index:30;width:48px;height:48px;padding:0;border-radius:50%;font-size:22px;background:#292b34;border:1px solid #454854;box-shadow:0 5px 20px #0007}.profile-settings-button:hover{transform:rotate(25deg)}.profile-settings-modal{position:fixed;inset:0;z-index:60;background:#000a;display:grid;place-items:center;padding:18px}.profile-settings-card{width:min(440px,100%);max-height:min(85vh,700px);overflow:auto;background:#1b1d25;border:1px solid #424552;border-radius:16px;padding:22px;box-shadow:0 20px 70px #0009}.profile-settings-card h2{margin-bottom:18px}.profile-settings-card .field{margin-bottom:16px}.profile-settings-actions{display:flex;justify-content:flex-end;margin-top:18px}@media(max-width:520px){.profile-settings-button{left:12px;bottom:12px;width:44px;height:44px}.profile-settings-card{padding:18px}}
 </style>
 </head>
 <body>
 <header class="topbar"><div class="topbar-inner"><h1>Cipher Chat</h1><div class="subtitle">Public rooms. Encrypted messages.</div></div></header>
+<button type="button" id="profileSettingsButton" class="profile-settings-button" aria-label="Profile settings" title="Change your name and picture">⚙️</button>
+<div id="profileSettingsModal" class="profile-settings-modal hidden" role="dialog" aria-modal="true" aria-labelledby="profileSettingsTitle"><div class="profile-settings-card"><h2 id="profileSettingsTitle">Profile settings</h2><div id="profileSettingsContent"></div><div class="profile-settings-actions"><button type="button" id="closeProfileSettings" class="primary">Done</button></div></div></div>
 <main>
 <section id="homePage" class="stack">
  <div class="panel stack"><div><h2>Welcome to Cipher Chat</h2><p class="muted">Create a room or join an existing one. Anyone can view encrypted messages without knowing the secret key.</p></div>
@@ -71,6 +74,12 @@ if(localStorage.getItem(NAME_STORAGE_KEY)===null)localStorage.setItem(NAME_STORA
 $("deviceName").value=localStorage.getItem(NAME_STORAGE_KEY)||"anonymous";
 function getDeviceName(){return(localStorage.getItem(NAME_STORAGE_KEY)||"anonymous").trim().slice(0,40)||"anonymous"}
 $("deviceName").addEventListener("input",()=>localStorage.setItem(NAME_STORAGE_KEY,$("deviceName").value.trim().slice(0,40)||"anonymous"));
+// Keep name and picture controls in the bottom-left gear menu.
+const profileSettingsContent=$("profileSettingsContent");
+profileSettingsContent.append($("deviceName").closest(".field"),$("profilePreview").closest(".field"));
+$("profileSettingsButton").addEventListener("click",()=>$("profileSettingsModal").classList.remove("hidden"));
+$("closeProfileSettings").addEventListener("click",()=>$("profileSettingsModal").classList.add("hidden"));
+$("profileSettingsModal").addEventListener("click",e=>{if(e.target.id==="profileSettingsModal")e.currentTarget.classList.add("hidden")});
 function getProfilePicture(){return localStorage.getItem(PROFILE_STORAGE_KEY)||""}
 function updateProfilePreview(){const pic=getProfilePicture(),preview=$("profilePreview");preview.replaceChildren();preview.classList.toggle("silhouette",!pic);if(pic){const img=document.createElement("img");img.src=pic;img.alt="Your profile picture";preview.appendChild(img)}$("profileNamePreview").textContent=getDeviceName()}
 $("chooseProfilePicture").addEventListener("click",()=>$("profilePictureInput").click());
